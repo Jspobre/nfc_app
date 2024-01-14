@@ -30,6 +30,16 @@ class Home extends StatelessWidget {
                   ),
                 ),
               );
+              // POPUP MENU ITEMS - View Attendance
+              items.add(
+                const PopupMenuItem<String>(
+                  value: 'attendance',
+                  child: Text(
+                    'View Attendance',
+                    style: TextStyle(fontFamily: "Roboto"),
+                  ),
+                ),
+              );
               // POPUP MENU ITEMS - RESET NFC TAG
               items.add(
                 const PopupMenuItem<String>(
@@ -48,9 +58,12 @@ class Home extends StatelessWidget {
                 case 'addstudent':
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return const AddStudent();
+                      return AddStudent();
                     }),
                   );
+                  break;
+                case 'attendance':
+                  print("attendance");
                   break;
                 case 'reset':
                   print("clicked reset");
@@ -67,12 +80,12 @@ class Home extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
           children: [
-            Column(
+            const Column(
               children: [
-                const SizedBox(
+                SizedBox(
                   height: 40,
                 ),
-                const Text(
+                Text(
                   "Welcome to NFC: Tag Reader",
                   style: TextStyle(fontFamily: "Roboto", fontSize: 20),
                 ),

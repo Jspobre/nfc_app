@@ -18,9 +18,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'NFC: Tag Reader',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        // colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         textTheme: GoogleFonts.poppinsTextTheme().copyWith(
           bodyLarge: const TextStyle(
             fontSize: 16,
