@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "533389666766",
+    "project_id": "nfc-app-fb987",
+    "storage_bucket": "nfc-app-fb987.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:533389666766:android:31d031d1beaee758bbe39f",
+        "android_client_info": {
+          "package_name": "com.example.nfc_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf0aeSZwYetfI8yNngNnNG-tSQO-8TFnk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
