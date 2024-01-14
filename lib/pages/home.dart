@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nfc_app/pages/add%20student/add_student.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 
 class Home extends StatelessWidget {
@@ -14,7 +15,62 @@ class Home extends StatelessWidget {
         ),
         centerTitle: true,
         actions: [
-          Image.asset('lib/images/image 3.png'),
+          PopupMenuButton<String>(
+            icon: Image.asset('lib/images/image 3.png'),
+            itemBuilder: (BuildContext context) {
+              List<PopupMenuEntry<String>> items = [];
+
+              // POPUP MENU ITEMS - ADD STUDENT
+              items.add(
+                const PopupMenuItem<String>(
+                  value: 'addstudent',
+                  child: Text(
+                    'Add student details',
+                    style: TextStyle(fontFamily: "Roboto"),
+                  ),
+                ),
+              );
+              // POPUP MENU ITEMS - View Attendance
+              items.add(
+                const PopupMenuItem<String>(
+                  value: 'attendance',
+                  child: Text(
+                    'View Attendance',
+                    style: TextStyle(fontFamily: "Roboto"),
+                  ),
+                ),
+              );
+              // POPUP MENU ITEMS - RESET NFC TAG
+              items.add(
+                const PopupMenuItem<String>(
+                  value: 'reset',
+                  child: Text(
+                    "Reset Tag",
+                    style: TextStyle(fontFamily: "Roboto"),
+                  ),
+                ),
+              );
+
+              return items;
+            },
+            onSelected: (String value) {
+              switch (value) {
+                case 'addstudent':
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return AddStudent();
+                    }),
+                  );
+                  break;
+                case 'attendance':
+                  print("attendance");
+                  break;
+                case 'reset':
+                  print("clicked reset");
+                  break;
+              }
+            },
+          ),
         ],
       ),
       body: SafeArea(
@@ -24,12 +80,12 @@ class Home extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
           children: [
-            Column(
+            const Column(
               children: [
-                const SizedBox(
+                SizedBox(
                   height: 40,
                 ),
-                const Text(
+                Text(
                   "Welcome to NFC: Tag Reader",
                   style: TextStyle(fontFamily: "Roboto", fontSize: 20),
                 ),
