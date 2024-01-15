@@ -9,6 +9,7 @@ class StyledTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      style: const TextStyle(fontFamily: "Roboto", fontWeight: FontWeight.w400),
       controller: controller,
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -18,6 +19,11 @@ class StyledTextFormField extends StatelessWidget {
       },
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: Color(0xff16A637), // You can set the color of the border
+          ),
+        ),
         border: const UnderlineInputBorder(
           borderSide: BorderSide(
             color: Colors.black, // You can set the color of the border
