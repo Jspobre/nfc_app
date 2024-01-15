@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nfc_app/pages/add%20student/add_student.dart';
+import 'package:nfc_app/pages/attendance%20report/attendance_report.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 
 class Home extends StatelessWidget {
@@ -63,7 +64,12 @@ class Home extends StatelessWidget {
                   );
                   break;
                 case 'attendance':
-                  print("attendance");
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return AttendanceReport();
+                    }),
+                  );
+
                   break;
                 case 'reset':
                   print("clicked reset");
