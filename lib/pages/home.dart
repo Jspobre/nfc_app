@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
+// import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
+// import 'package:ndef/ndef.dart' as ndef;
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:nfc_app/pages/add%20student/add_student.dart';
 import 'package:nfc_app/pages/attendance%20report/attendance_report.dart';
+import 'package:nfc_app/widgets/bottom%20sheet%20modal/floating_modal.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
 
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +45,7 @@ class Home extends StatelessWidget {
                 const PopupMenuItem<String>(
                   value: 'attendance',
                   child: Text(
-                    'View Attendance',
+                    'View attendance',
                     style: TextStyle(fontFamily: "Roboto"),
                   ),
                 ),
@@ -46,7 +55,7 @@ class Home extends StatelessWidget {
                 const PopupMenuItem<String>(
                   value: 'reset',
                   child: Text(
-                    "Reset Tag",
+                    "Reset tag",
                     style: TextStyle(fontFamily: "Roboto"),
                   ),
                 ),
@@ -72,7 +81,20 @@ class Home extends StatelessWidget {
 
                   break;
                 case 'reset':
-                  print("clicked reset");
+                  showFloatingModalBottomSheet(
+                    context: context,
+                    builder: (context) => SizedBox(
+                      height: 400,
+                      child: Center(
+                        child: ElevatedButton(
+                          child: Text("Close"),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    ),
+                  );
                   break;
               }
             },
@@ -104,7 +126,23 @@ class Home extends StatelessWidget {
               children: [
                 StyledButton(
                   btnText: "Read",
-                  onClick: () {},
+                  onClick: () {
+                    // exmaple
+                    showFloatingModalBottomSheet(
+                      context: context,
+                      builder: (context) => SizedBox(
+                        height: 400,
+                        child: Center(
+                          child: ElevatedButton(
+                            child: Text("Close"),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                   noShadow: true,
                   btnWidth: double.infinity,
                 ),
@@ -113,7 +151,23 @@ class Home extends StatelessWidget {
                 ),
                 StyledButton(
                   btnText: "Write",
-                  onClick: () {},
+                  onClick: () {
+                    // example
+                    showFloatingModalBottomSheet(
+                      context: context,
+                      builder: (context) => SizedBox(
+                        height: 400,
+                        child: Center(
+                          child: ElevatedButton(
+                            child: Text("Close"),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                   noShadow: true,
                   btnWidth: double.infinity,
                 ),
