@@ -12,6 +12,7 @@ class StyledButton extends StatelessWidget {
   final double? btnWidth;
   final double? btnHeight;
   final dynamic btnColor;
+  final dynamic textColor;
   final bool? noShadow;
   final String? secondText;
   final dynamic borderRadius;
@@ -27,6 +28,7 @@ class StyledButton extends StatelessWidget {
     this.noShadow,
     this.secondText,
     this.borderRadius,
+    this.textColor,
   });
 
   @override
@@ -44,7 +46,7 @@ class StyledButton extends StatelessWidget {
             shape: RoundedRectangleBorder(
                 borderRadius: borderRadius ?? BorderRadius.circular(8)),
             backgroundColor: btnColor ?? const Color(0xff16A637),
-            foregroundColor: Colors.white,
+            foregroundColor: textColor ?? Colors.white,
             textStyle: const TextStyle(
                 letterSpacing: 1, fontWeight: FontWeight.w500, fontSize: 16),
           ),
@@ -71,7 +73,7 @@ class StyledButton extends StatelessWidget {
             shape: RoundedRectangleBorder(
                 borderRadius: borderRadius ?? BorderRadius.circular(8)),
             backgroundColor: btnColor ?? Color(0xff16A637),
-            foregroundColor: Colors.white,
+            foregroundColor: textColor ?? Colors.white,
             textStyle: const TextStyle(
                 letterSpacing: 1,
                 fontWeight: FontWeight.w400,
