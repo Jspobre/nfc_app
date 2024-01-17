@@ -6,8 +6,7 @@ import 'package:nfc_app/pages/add%20student/add_student.dart';
 import 'package:nfc_app/pages/attendance%20report/attendance_report.dart';
 import 'package:nfc_app/widgets/bottom%20sheet%20modal/floating_modal.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
-
-import 'package:ndef/utilities.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -22,6 +21,8 @@ class _HomeState extends State<Home> {
   NFCTag? _tag;
   String? _result, _writeResult, _mifareResult;
   ndef.NDEFRecord? _record;
+  String tappedStudentInfo = '';
+  String? tappedFullName;
 
   @override
   void initState() {
@@ -29,7 +30,6 @@ class _HomeState extends State<Home> {
     initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     NFCAvailability availability;
     try {
@@ -38,16 +38,27 @@ class _HomeState extends State<Home> {
       availability = NFCAvailability.not_supported;
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     setState(() {
-      // _platformVersion = platformVersion;
       _availability = availability;
     });
   }
+
+  Future<List<DocumentSnapshot>> fetchDataFromFirestore() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('students').get();
+
+      List<DocumentSnapshot> documents = querySnapshot.docs;
+      return documents;
+    } catch (e) {
+      print("Error fetching data from Firestore: $e");
+      return [];
+    }
+  }
+
+// Function to write NFC data
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +75,6 @@ class _HomeState extends State<Home> {
             itemBuilder: (BuildContext context) {
               List<PopupMenuEntry<String>> items = [];
 
-              // POPUP MENU ITEMS - ADD STUDENT
               items.add(
                 const PopupMenuItem<String>(
                   value: 'addstudent',
@@ -74,7 +84,6 @@ class _HomeState extends State<Home> {
                   ),
                 ),
               );
-              // POPUP MENU ITEMS - View Attendance
               items.add(
                 const PopupMenuItem<String>(
                   value: 'attendance',
@@ -84,7 +93,6 @@ class _HomeState extends State<Home> {
                   ),
                 ),
               );
-              // POPUP MENU ITEMS - RESET NFC TAG
               items.add(
                 const PopupMenuItem<String>(
                   value: 'reset',
@@ -112,14 +120,12 @@ class _HomeState extends State<Home> {
                       return AttendanceReport();
                     }),
                   );
-
                   break;
                 case 'reset':
                   setState(() {
                     _writeResult = null;
                   });
                   writeEmptyRawRecordToNFC(context);
-
                   break;
               }
             },
@@ -127,85 +133,156 @@ class _HomeState extends State<Home> {
         ],
       ),
       body: SafeArea(
-          child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 44),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            const Column(
-              children: [
-                SizedBox(
-                  height: 40,
-                ),
-                Text(
-                  "Welcome to NFC: Tag Reader",
-                  style: TextStyle(fontFamily: "Roboto", fontSize: 20),
-                ),
-              ],
-            ),
-            Image.asset(
-              'lib/images/image 1.png',
-            ),
-            Column(
-              children: [
-                StyledButton(
-                  btnText: "Read",
-                  onClick: () {
-                    // exmaple
-                    showFloatingModalBottomSheet(
-                      context: context,
-                      builder: (context) => SizedBox(
-                        height: 400,
-                        child: Center(
-                          child: ElevatedButton(
-                            child: Text("Close"),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 44),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Column(
+                children: [
+                  SizedBox(
+                    height: 40,
+                  ),
+                  Text(
+                    "Welcome to NFC: Tag Reader",
+                    style: TextStyle(fontFamily: "Roboto", fontSize: 20),
+                  ),
+                  if (tappedStudentInfo.isNotEmpty)
+                    Text(
+                      tappedStudentInfo,
+                      style: TextStyle(
+                        fontFamily: "Roboto",
+                        fontSize: 18,
+                        color: Colors.black,
+                      ),
+                    ),
+                ],
+              ),
+              Image.asset(
+                'lib/images/image 1.png',
+              ),
+              Column(
+                children: [
+                  StyledButton(
+                    btnText: "Read",
+                    onClick: () {
+                      showFloatingModalBottomSheet(
+                        context: context,
+                        builder: (context) => SizedBox(
+                          height: 400,
+                          child: Center(
+                            child: ElevatedButton(
+                              child: Text("Close"),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                  noShadow: true,
-                  btnWidth: double.infinity,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                StyledButton(
-                  btnText: "Write",
-                  onClick: () {
-                    // example
-                    showFloatingModalBottomSheet(
-                      context: context,
-                      builder: (context) => SizedBox(
-                        height: 400,
-                        child: Center(
-                          child: ElevatedButton(
-                            child: Text("Close"),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
+                      );
+                    },
+                    noShadow: true,
+                    btnWidth: double.infinity,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  StyledButton(
+                    btnText: "Write",
+                    onClick: () {
+                      showFloatingModalBottomSheet(
+                        context: context,
+                        builder: (context) =>
+                            FutureBuilder<List<DocumentSnapshot>>(
+                          future: fetchDataFromFirestore(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text("Error: ${snapshot.error}");
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return Text("No data available");
+                            } else {
+                              List<DocumentSnapshot> documents = snapshot.data!;
+                              return SizedBox(
+                                height: 400,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    for (DocumentSnapshot document in documents)
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            tappedStudentInfo =
+                                                "Tapped Student Number: ${document['student_num']}, Full Name: ${document['full_name']}";
+                                          });
+                                        },
+                                        child: Container(
+                                          margin: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          padding: EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[
+                                                200], // Adjust the color as needed
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Student Number: ${document['student_num']}",
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "Full Name: ${document['full_name']}",
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ElevatedButton(
+                                      child: Text("Close"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                          },
                         ),
-                      ),
-                    );
-                  },
-                  noShadow: true,
-                  btnWidth: double.infinity,
-                ),
-              ],
-            )
-          ],
+                      );
+                    },
+                    noShadow: true,
+                    btnWidth: double.infinity,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      )),
+      ),
     );
   }
 
   Future<void> writeEmptyRawRecordToNFC(BuildContext context) async {
-    // SHOW MODAL
     showFloatingModalBottomSheet(
       context: context,
       builder: (context) => SizedBox(
@@ -241,40 +318,10 @@ class _HomeState extends State<Home> {
                     onClick: () async {
                       await FlutterNfcKit.finish();
                       Navigator.pop(context);
-                    })
+                    }),
           ],
         ),
       ),
     );
-
-    // SCAN AND WRITE
-    try {
-      NFCTag tag = await FlutterNfcKit.poll();
-      setState(() {
-        _tag = tag;
-      });
-      if (tag.type == NFCTagType.mifare_ultralight ||
-          tag.type == NFCTagType.mifare_classic ||
-          tag.type == NFCTagType.iso15693) {
-        await FlutterNfcKit.writeNDEFRecords([
-          ndef.NDEFRecord(
-              tnf: ndef.TypeNameFormat.values[0], // 0 for empty record
-              type: ''.toBytes(),
-              id: ''.toBytes(),
-              payload: ''.toBytes())
-        ]);
-        setState(() {
-          _writeResult = 'OK';
-        });
-      } else {
-        setState(() {
-          _writeResult = 'error: NDEF not supported: ${tag.type}';
-        });
-      }
-    } catch (e) {
-      print("Error resetting tag: $e");
-    } finally {
-      await FlutterNfcKit.finish();
-    }
   }
 }
