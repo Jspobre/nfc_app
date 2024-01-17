@@ -207,62 +207,61 @@ class _HomeState extends State<Home> {
                               return Text("No data available");
                             } else {
                               List<DocumentSnapshot> documents = snapshot.data!;
-                              return SizedBox(
-                                height: 400,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    for (DocumentSnapshot document in documents)
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            tappedStudentInfo =
-                                                "Tapped Student Number: ${document['student_num']}, Full Name: ${document['full_name']}";
-                                          });
-                                        },
-                                        child: Container(
-                                          margin: EdgeInsets.symmetric(
-                                              vertical: 10),
-                                          padding: EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[
-                                                200], // Adjust the color as needed
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "Student Number: ${document['student_num']}",
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                    ),
+                              return Container(
+                                padding: EdgeInsets.all(16),
+                                child: SizedBox(
+                                  height: 400,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      for (DocumentSnapshot document
+                                          in documents)
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              tappedStudentInfo =
+                                                  "Tapped Student Number: ${document['student_num']} \n Full Name: ${document['full_name']}";
+                                            });
+                                          },
+                                          child: Container(
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 10),
+                                            padding: EdgeInsets.all(10),
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[200],
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Student Number: ${document['student_num']}",
+                                                  style: TextStyle(
+                                                    color: Colors.black,
                                                   ),
-                                                  Text(
-                                                    "Full Name: ${document['full_name']}",
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                    ),
+                                                ),
+                                                Text(
+                                                  "Full Name: ${document['full_name']}",
+                                                  style: TextStyle(
+                                                    color: Colors.black,
                                                   ),
-                                                ],
-                                              ),
-                                            ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
+                                      ElevatedButton(
+                                        child: Text("Close"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
                                       ),
-                                    ElevatedButton(
-                                      child: Text("Close"),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               );
                             }
