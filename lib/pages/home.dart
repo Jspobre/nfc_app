@@ -192,6 +192,9 @@ class _HomeState extends State<Home> {
                   StyledButton(
                     btnText: "Write",
                     onClick: () {
+                      BuildContext originalContext =
+                          context; // Store the original context
+
                       showFloatingModalBottomSheet(
                         context: context,
                         builder: (context) =>
@@ -219,41 +222,113 @@ class _HomeState extends State<Home> {
                                       for (DocumentSnapshot document
                                           in documents)
                                         GestureDetector(
-                                          onTap: () {
+                                          onTap: () async {
                                             setState(() {
                                               tappedStudentInfo =
-                                                  "Tapped Student Number: ${document['student_num']} \n Full Name: ${document['full_name']}";
+                                                  "${document['student_num']} - ${document['full_name']}";
                                             });
+
+                                            // Get the NFC tag and read existing NDEF records
+                                            NFCTag tag =
+                                                await FlutterNfcKit.poll();
+                                            if (tag != null) {
+                                              List<ndef.NDEFRecord>
+                                                  existingRecords =
+                                                  await FlutterNfcKit
+                                                      .readNDEFRecords();
+
+                                              // Check if there are any existing records on the NFC tag
+                                              // if (existingRecords.isNotEmpty) {
+                                              //   // Show a message or handle accordingly (e.g., don't proceed)
+                                              //   setState(() {
+                                              //     _writeResult =
+                                              //         'Error: NFC tag already contains a record.';
+                                              //   });
+                                              //   return;
+                                              // }
+
+                                              // Create NDEF record with student details
+                                              ndef.TextRecord ndefRecord =
+                                                  ndef.TextRecord(
+                                                text: tappedStudentInfo,
+                                                language: 'en',
+                                              );
+
+                                              // Write the NDEF record to the NFC tag
+                                              await FlutterNfcKit
+                                                  .writeNDEFRecords(
+                                                      [ndefRecord]);
+
+                                              // Update Firestore document to indicate that the information has been written
+                                              await FirebaseFirestore.instance
+                                                  .collection('students')
+                                                  .doc(document.id)
+                                                  .update(
+                                                      {'nfc_written': true});
+
+                                              // Remove the document from the list in the modal
+                                              setState(() {
+                                                tappedStudentInfo =
+                                                    ''; // Clear the student info
+                                                documents.remove(document);
+                                              });
+
+                                              // Show a success message using SnackBar
+                                              ScaffoldMessenger.of(
+                                                      originalContext)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'NFC tag successfully written with student details!',
+                                                  ),
+                                                  duration:
+                                                      Duration(seconds: 2),
+                                                ),
+                                              );
+                                            } else {
+                                              setState(() {
+                                                _writeResult =
+                                                    'Error: No NFC tag detected.';
+                                              });
+                                            }
+
+                                            // Close the modal (if it's open)
+                                            if (Navigator.canPop(context)) {
+                                              Navigator.pop(context);
+                                            }
                                           },
-                                          child: Container(
-                                            margin: EdgeInsets.symmetric(
-                                                vertical: 10),
-                                            padding: EdgeInsets.all(10),
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey[200],
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  "Student Number: ${document['student_num']}",
-                                                  style: TextStyle(
-                                                    color: Colors.black,
+                                          child: document['nfc_written'] == true
+                                              ? Container() // Don't display the container if nfc_written is true
+                                              : Container(
+                                                  margin: EdgeInsets.symmetric(
+                                                      vertical: 10),
+                                                  padding: EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey[200],
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        "Student Number: ${document['student_num']}",
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "Full Name: ${document['full_name']}",
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                                Text(
-                                                  "Full Name: ${document['full_name']}",
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
                                         ),
                                       ElevatedButton(
                                         child: Text("Close"),
