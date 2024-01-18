@@ -10,6 +10,8 @@ import 'package:nfc_app/widgets/styledButton.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io' show Platform, sleep;
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -27,6 +29,8 @@ class _HomeState extends State<Home> {
   String tappedStudentInfo = '';
   String? tappedFullName;
   bool _scanning = false;
+  final DatabaseReference _databaseReference = FirebaseDatabase.instance.ref();
+
   @override
   void initState() {
     super.initState();
@@ -140,7 +144,7 @@ class _HomeState extends State<Home> {
                   ''; // Use the null-aware operator to handle null values
             }
           }
-          showDetailsContainer(tag);
+          showDetailsContainer(tag, textContent);
           setState(() {
             _result = ' $textContent';
           });
@@ -160,7 +164,18 @@ class _HomeState extends State<Home> {
     }
   }
 
-  void showDetailsContainer(NFCTag tag) {
+  void showDetailsContainer(NFCTag tag, String scannedData) {
+    // Push scanned data to Firebase
+// Push scanned data to Firebase
+    _databaseReference.push().set({
+      'timestamp': ServerValue.timestamp,
+      'tag_data': scannedData,
+    }).then((_) {
+      print('Data inserted successfully');
+    }).catchError((error) {
+      print('Error inserting data: $error');
+    });
+
     showGeneralDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.5),

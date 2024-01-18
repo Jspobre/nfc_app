@@ -44,7 +44,9 @@ dependencies:
   flutter_nfc_kit: ^3.4.2
   ndef: ^0.3.3
   pdf: ^3.10.7
+  firebase_database: ^10.4.0
 
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
