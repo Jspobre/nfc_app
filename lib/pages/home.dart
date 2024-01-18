@@ -159,7 +159,7 @@ class _HomeState extends State<Home> {
       }
 
       // Pretend that we are working
-      if (!kIsWeb) sleep(Duration(seconds: 1));
+      if (!kIsWeb) ;
       await FlutterNfcKit.finish(iosAlertMessage: "Finished!");
     }
   }
