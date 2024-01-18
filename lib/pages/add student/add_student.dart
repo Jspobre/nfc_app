@@ -547,7 +547,7 @@ class _AddStudentState extends State<AddStudent> {
         FirebaseFirestore.instance.collection('students').add({
           'student_num': studentNum,
           'full_name': studentName,
-          'is_irregular': isIrregStatus,
+          'isIrregular': isIrregStatus,
           'course': courseName,
           'year_level': yearLevel,
           'block': block
