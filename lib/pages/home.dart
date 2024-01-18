@@ -61,59 +61,97 @@ class _HomeState extends State<Home> {
     }
   }
 
-  // Future<void> showInitialModal() async {
-  //   showFloatingModalBottomSheet(
-  //     context: context,
-  //     builder: (context) => SizedBox(
-  //       height: 400,
-  //       child: Column(
-  //         mainAxisAlignment: MainAxisAlignment.spaceAround,
-  //         children: [
-  //           _writeResult == "OK"
-  //               ? const SizedBox()
-  //               : const Text(
-  //                   "Ready to Scan",
-  //                   style: TextStyle(
-  //                     fontSize: 25,
-  //                     color: Color(0xff939393),
-  //                   ),
-  //                 ),
-  //           Image.asset(_writeResult == "OK"
-  //               ? 'lib/images/image 2.png'
-  //               : 'lib/images/image 4.png'),
-  //           const Text(
-  //             "Approach an NFC Tag",
-  //             style: TextStyle(
-  //               fontSize: 17,
-  //             ),
-  //           ),
-  //           _writeResult == "OK"
-  //               ? const SizedBox()
-  //               : StyledButton(
-  //                   noShadow: true,
-  //                   textColor: Colors.black,
-  //                   btnColor: const Color(0xffCECECE),
-  //                   btnText: "Cancel",
-  //                   onClick: () async {
-  //                     await FlutterNfcKit.finish();
-  //                     Navigator.pop(context);
-  //                   }),
-  //         ],
-  //       ),
-  //     ),
-  //   );
+  Future<void> showInitialModal() async {
+    showFloatingModalBottomSheet(
+      context: context,
+      builder: (context) => SizedBox(
+        height: 400,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _readResult == "OK"
+                ? const SizedBox()
+                : const Text(
+                    "Ready to Scan",
+                    style: TextStyle(
+                      fontSize: 25,
+                      color: Color(0xff939393),
+                    ),
+                  ),
+            Image.asset(_readResult == "OK"
+                ? 'lib/images/image 2.png'
+                : 'lib/images/image 4.png'),
+            const Text(
+              "Approach an NFC Tag",
+              style: TextStyle(
+                fontSize: 17,
+              ),
+            ),
+            _readResult == "OK"
+                ? const SizedBox()
+                : StyledButton(
+                    noShadow: true,
+                    textColor: Colors.black,
+                    btnColor: const Color(0xffCECECE),
+                    btnText: "Cancel",
+                    onClick: () async {
+                      await FlutterNfcKit.finish();
+                      Navigator.pop(context);
+                    }),
+          ],
+        ),
+      ),
+    );
 
-  //   await startScanning(); // Start continuous scanning
-  // }
+    await startScanning(); // Start continuous scanning
+  }
 
   Future<void> startScanning() async {
     while (true) {
       try {
         NFCTag tag = await FlutterNfcKit.poll();
-        // Your existing NFC tag processing logic
-        showDetailsContainer(tag);
+        setState(() {
+          _tag = tag;
+        });
+        await FlutterNfcKit.setIosAlertMessage("Working on it...");
+        _mifareResult = null;
+
+        if (tag.standard == "ISO 14443-4 (Type B)") {
+          String result1 = await FlutterNfcKit.transceive("00B0950000");
+          String result2 =
+              await FlutterNfcKit.transceive("00A4040009A00000000386980701");
+          setState(() {
+            _result = '1: $result1\n2: $result2\n';
+          });
+        } else if (tag.type == NFCTagType.iso18092) {
+          String result1 = await FlutterNfcKit.transceive("060080080100");
+          setState(() {
+            _result = '1: $result1\n';
+          });
+        } else if (tag.ndefAvailable ?? false) {
+          var ndefRecords = await FlutterNfcKit.readNDEFRecords();
+          var textContent = '';
+
+          for (int i = 0; i < ndefRecords.length; i++) {
+            if (ndefRecords[i] is ndef.TextRecord) {
+              // Extract and concatenate text content from TextRecord
+              String? recordText = (ndefRecords[i] as ndef.TextRecord).text;
+              textContent += recordText ??
+                  ''; // Use the null-aware operator to handle null values
+            }
+          }
+          showDetailsContainer(tag);
+          setState(() {
+            _result = ' $textContent';
+          });
+        } else if (tag.type == NFCTagType.webusb) {
+          var r = await FlutterNfcKit.transceive("00A4040006D27600012401");
+          print(r);
+        }
       } catch (e) {
-        // Handle errors
+        setState(() {
+          _result = 'error: $e';
+        });
       }
 
       // Pretend that we are working
@@ -155,8 +193,9 @@ class _HomeState extends State<Home> {
                     ),
                     // Display the NFC details
                     tag != null
-                        ? Text('Transceive Result:\n${tag.toString()}')
-                        : const Text('No tag scanned yet.'),
+                        ? Text('Transceive Result:\n$_result')
+                        : const Text('Empty NFC Tag'),
+
                     StyledButton(
                       noShadow: true,
                       textColor: Colors.black,
@@ -285,164 +324,124 @@ class _HomeState extends State<Home> {
                   StyledButton(
                     btnText: "Read",
                     onClick: () async {
-                      // await showInitialModal();
-                      setState(() {
-                        _readResult == 'OK';
-                      });
+                      await showInitialModal();
+                      // setState(() {
+                      //   _readResult == 'OK';
+                      // });
 
-                      showFloatingModalBottomSheet(
-                        context: context,
-                        builder: (context) => SizedBox(
-                          height: 400,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _readResult == "OK"
-                                  ? const SizedBox()
-                                  : const Text(
-                                      "Ready to Scan",
-                                      style: TextStyle(
-                                        fontSize: 25,
-                                        color: Color(0xff939393),
-                                      ),
-                                    ),
-                              Image.asset(_readResult == "OK"
-                                  ? 'lib/images/image 2.png'
-                                  : 'lib/images/image 4.png'),
-                              const Text(
-                                "Approach an NFC Tag",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                ),
-                              ),
-                              _readResult == "OK"
-                                  ? const SizedBox()
-                                  : StyledButton(
-                                      noShadow: true,
-                                      textColor: Colors.black,
-                                      btnColor: const Color(0xffCECECE),
-                                      btnText: "Cancel",
-                                      onClick: () async {
-                                        await FlutterNfcKit.finish();
-                                        Navigator.pop(context);
-                                      }),
-                            ],
-                          ),
-                        ),
-                      );
-                      try {
-                        NFCTag tag = await FlutterNfcKit.poll();
-                        setState(() {
-                          _tag = tag;
-                        });
-                        await FlutterNfcKit.setIosAlertMessage(
-                            "Working on it...");
-                        _mifareResult = null;
+                      // try {
+                      //   NFCTag tag = await FlutterNfcKit.poll();
+                      //   setState(() {
+                      //     _tag = tag;
+                      //   });
+                      //   await FlutterNfcKit.setIosAlertMessage(
+                      //       "Working on it...");
+                      //   _mifareResult = null;
 
-                        if (tag.standard == "ISO 14443-4 (Type B)") {
-                          String result1 =
-                              await FlutterNfcKit.transceive("00B0950000");
-                          String result2 = await FlutterNfcKit.transceive(
-                              "00A4040009A00000000386980701");
-                          setState(() {
-                            _result = '1: $result1\n2: $result2\n';
-                          });
-                        } else if (tag.type == NFCTagType.iso18092) {
-                          String result1 =
-                              await FlutterNfcKit.transceive("060080080100");
-                          setState(() {
-                            _result = '1: $result1\n';
-                          });
-                        } else if (tag.ndefAvailable ?? false) {
-                          var ndefRecords =
-                              await FlutterNfcKit.readNDEFRecords();
-                          var textContent = '';
+                      //   if (tag.standard == "ISO 14443-4 (Type B)") {
+                      //     String result1 =
+                      //         await FlutterNfcKit.transceive("00B0950000");
+                      //     String result2 = await FlutterNfcKit.transceive(
+                      //         "00A4040009A00000000386980701");
+                      //     setState(() {
+                      //       _result = '1: $result1\n2: $result2\n';
+                      //     });
+                      //   } else if (tag.type == NFCTagType.iso18092) {
+                      //     String result1 =
+                      //         await FlutterNfcKit.transceive("060080080100");
+                      //     setState(() {
+                      //       _result = '1: $result1\n';
+                      //     });
+                      //   } else if (tag.ndefAvailable ?? false) {
+                      //     var ndefRecords =
+                      //         await FlutterNfcKit.readNDEFRecords();
+                      //     var textContent = '';
 
-                          for (int i = 0; i < ndefRecords.length; i++) {
-                            if (ndefRecords[i] is ndef.TextRecord) {
-                              // Extract and concatenate text content from TextRecord
-                              String? recordText =
-                                  (ndefRecords[i] as ndef.TextRecord).text;
-                              textContent += recordText ??
-                                  ''; // Use the null-aware operator to handle null values
-                            }
-                          }
+                      //     for (int i = 0; i < ndefRecords.length; i++) {
+                      //       if (ndefRecords[i] is ndef.TextRecord) {
+                      //         // Extract and concatenate text content from TextRecord
+                      //         String? recordText =
+                      //             (ndefRecords[i] as ndef.TextRecord).text;
+                      //         textContent += recordText ??
+                      //             ''; // Use the null-aware operator to handle null values
+                      //       }
+                      //     }
 
-                          setState(() {
-                            _result = ' $textContent';
-                          });
-                        } else if (tag.type == NFCTagType.webusb) {
-                          var r = await FlutterNfcKit.transceive(
-                              "00A4040006D27600012401");
-                          print(r);
-                        }
-                      } catch (e) {
-                        setState(() {
-                          _result = 'error: $e';
-                        });
-                      }
+                      //     setState(() {
+                      //       _result = ' $textContent';
+                      //     });
+                      //   } else if (tag.type == NFCTagType.webusb) {
+                      //     var r = await FlutterNfcKit.transceive(
+                      //         "00A4040006D27600012401");
+                      //     print(r);
+                      //   }
+                      // } catch (e) {
+                      //   setState(() {
+                      //     _result = 'error: $e';
+                      //   });
+                      // }
 
-                      // Pretend that we are working
-                      if (!kIsWeb) sleep(new Duration(seconds: 1));
-                      await FlutterNfcKit.finish(iosAlertMessage: "Finished!");
+                      // // Pretend that we are working
+                      // if (!kIsWeb) sleep(new Duration(seconds: 1));
+                      // await FlutterNfcKit.finish(iosAlertMessage: "Finished!");
 
                       // Display the NFC details in a modal
-                      // Display the NFC details in a modal
-                      showGeneralDialog(
-                        context: context,
-                        barrierColor: Colors.black.withOpacity(0.5),
-                        barrierDismissible: false,
-                        barrierLabel: '',
-                        transitionDuration: Duration(milliseconds: 400),
-                        pageBuilder: (context, animation1, animation2) {
-                          return Align(
-                            alignment: Alignment.center,
-                            child: Container(
-                              margin:
-                                  EdgeInsets.only(top: 50, left: 12, right: 12),
-                              height: 300, // Adjust the height as needed
-                              child: Card(
-                                elevation: 8,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      const SizedBox(),
-                                      Image.asset('lib/images/image 2.png'),
-                                      const Text(
-                                        "NFC Tag Details",
-                                        style: TextStyle(
-                                          fontSize: 17,
-                                        ),
-                                      ),
-                                      // Display the NFC details
-                                      _tag != null
-                                          ? Text(
-                                              '\nTransceive Result:\n$_result')
-                                          : const Text('No tag scanned yet.'),
-                                      StyledButton(
-                                        noShadow: true,
-                                        textColor: Colors.black,
-                                        btnColor: const Color(0xffCECECE),
-                                        btnText: "Cancel",
-                                        onClick: () async {
-                                          await FlutterNfcKit.finish();
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
+
+                      // showGeneralDialog(
+                      //   context: context,
+                      //   barrierColor: Colors.black.withOpacity(0.5),
+                      //   barrierDismissible: false,
+                      //   barrierLabel: '',
+                      //   transitionDuration: Duration(milliseconds: 400),
+                      //   pageBuilder: (context, animation1, animation2) {
+                      //     return Align(
+                      //       alignment: Alignment.center,
+                      //       child: Container(
+                      //         margin:
+                      //             EdgeInsets.only(top: 50, left: 12, right: 12),
+                      //         height: 300, // Adjust the height as needed
+                      //         child: Card(
+                      //           elevation: 8,
+                      //           shape: RoundedRectangleBorder(
+                      //             borderRadius: BorderRadius.circular(12),
+                      //           ),
+                      //           child: Padding(
+                      //             padding: const EdgeInsets.all(16.0),
+                      //             child: Column(
+                      //               mainAxisAlignment:
+                      //                   MainAxisAlignment.spaceAround,
+                      //               children: [
+                      //                 const SizedBox(),
+                      //                 Image.asset('lib/images/image 2.png'),
+                      //                 const Text(
+                      //                   "NFC Tag Details",
+                      //                   style: TextStyle(
+                      //                     fontSize: 17,
+                      //                   ),
+                      //                 ),
+                      //                 // Display the NFC details
+                      //                 _tag != null
+                      //                     ? Text(
+                      //                         '\nTransceive Result:\n$_result')
+                      //                     : const Text('No tag scanned yet.'),
+                      //                 StyledButton(
+                      //                   noShadow: true,
+                      //                   textColor: Colors.black,
+                      //                   btnColor: const Color(0xffCECECE),
+                      //                   btnText: "Cancel",
+                      //                   onClick: () async {
+                      //                     await FlutterNfcKit.finish();
+                      //                     Navigator.pop(context);
+                      //                   },
+                      //                 ),
+                      //               ],
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     );
+                      //   },
+                      // );
                     },
                     noShadow: true,
                     btnWidth: double.infinity,
