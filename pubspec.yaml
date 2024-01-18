@@ -43,6 +43,7 @@ dependencies:
   modal_bottom_sheet: ^3.0.0-pre
   flutter_nfc_kit: ^3.4.2
   ndef: ^0.3.3
+  pdf: ^3.10.7
 
 dev_dependencies:
   flutter_test:

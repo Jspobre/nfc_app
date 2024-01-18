@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:ndef/ndef.dart' as ndef;
+import 'package:ndef/utilities.dart';
 import 'package:nfc_app/pages/add%20student/add_student.dart';
 import 'package:nfc_app/pages/attendance%20report/attendance_report.dart';
 import 'package:nfc_app/widgets/bottom%20sheet%20modal/floating_modal.dart';
@@ -282,6 +283,7 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> writeEmptyRawRecordToNFC(BuildContext context) async {
+    //! SHOW MODAL
     showFloatingModalBottomSheet(
       context: context,
       builder: (context) => SizedBox(
@@ -322,5 +324,66 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
+
+    resetTag().then(
+      (value) {
+        Navigator.pop(context);
+
+        if (_writeResult == "OK") {
+          showFloatingModalBottomSheet(
+            dismissable: true,
+            context: context,
+            builder: (context) => SizedBox(
+              height: 400,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Image.asset('lib/images/image 2.png'),
+                  const Text(
+                    "Successfully reset the NFC Tag",
+                    style: TextStyle(
+                      fontSize: 17,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Future<void> resetTag() async {
+    //! SCAN AND WRITE
+    try {
+      NFCTag tag = await FlutterNfcKit.poll();
+      setState(() {
+        _tag = tag;
+      });
+      if (tag.type == NFCTagType.mifare_ultralight ||
+          tag.type == NFCTagType.mifare_classic ||
+          tag.type == NFCTagType.iso15693) {
+        await FlutterNfcKit.writeNDEFRecords([
+          ndef.NDEFRecord(
+              tnf: ndef.TypeNameFormat.values[0], // 0 for empty record
+              type: ''.toBytes(),
+              id: ''.toBytes(),
+              payload: ''.toBytes())
+        ]);
+
+        setState(() {
+          _writeResult = 'OK';
+        });
+      } else {
+        setState(() {
+          _writeResult = 'error: NDEF not supported: ${tag.type}';
+        });
+      }
+    } catch (e) {
+      print("Error resetting tag: $e");
+    } finally {
+      await FlutterNfcKit.finish();
+    }
   }
 }
