@@ -159,7 +159,6 @@ class _HomeState extends State<Home> {
         });
       }
 
-      // Pretend that we are working
       if (!kIsWeb) ;
       await FlutterNfcKit.finish(iosAlertMessage: "Finished!");
     }
@@ -170,7 +169,8 @@ class _HomeState extends State<Home> {
         FlutterLocalNotificationsPlugin();
 
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('logo');
+        AndroidInitializationSettings(
+            'logo'); //this is found in android/app/src/main/res/drawable. Can change to other images
     final InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
@@ -188,10 +188,10 @@ class _HomeState extends State<Home> {
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      '0', // Change to a unique channel ID
-      'My App Notifications', // Change to a human-readable channel name
-      channelDescription:
-          'Notifications for My App', // Change to a description of your channel
+      //parameters to be set for the notification
+      '0',
+      'My App Notifications',
+      channelDescription: 'Notifications for My App',
       importance: Importance.max,
       priority: Priority.high,
       ticker: 'ticker',
@@ -202,6 +202,7 @@ class _HomeState extends State<Home> {
     );
 
     await flutterLocalNotificationsPlugin.show(
+      //details that are displayed in the notification
       0,
       'ATTENDANCE',
       tag != null ? 'Student Info:\n$_result' : 'Empty NFC Tag',
@@ -209,7 +210,6 @@ class _HomeState extends State<Home> {
       payload: 'item x',
     );
   }
-// Function to write NFC data
 
   @override
   Widget build(BuildContext context) {
