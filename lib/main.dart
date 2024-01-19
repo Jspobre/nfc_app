@@ -5,6 +5,7 @@ import 'package:nfc_app/pages/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp();
   runApp(
     MyApp(),

@@ -12,6 +12,7 @@ import 'dart:io' show Platform, sleep;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -164,9 +165,18 @@ class _HomeState extends State<Home> {
     }
   }
 
-  void showDetailsContainer(NFCTag tag, String scannedData) {
-    // Push scanned data to Firebase
-// Push scanned data to Firebase
+  void showDetailsContainer(NFCTag tag, String scannedData) async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('logo');
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
     _databaseReference.push().set({
       'timestamp': ServerValue.timestamp,
       'tag_data': scannedData,
@@ -176,58 +186,27 @@ class _HomeState extends State<Home> {
       print('Error inserting data: $error');
     });
 
-    showGeneralDialog(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.5),
-      barrierDismissible: false,
-      barrierLabel: '',
-      transitionDuration: Duration(milliseconds: 400),
-      pageBuilder: (context, animation1, animation2) {
-        return Align(
-          alignment: Alignment.center,
-          child: Container(
-            margin: EdgeInsets.only(top: 50, left: 12, right: 12),
-            height: 300,
-            child: Card(
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    const SizedBox(),
-                    Image.asset('lib/images/image 2.png'),
-                    const Text(
-                      "NFC Tag Details",
-                      style: TextStyle(
-                        fontSize: 17,
-                      ),
-                    ),
-                    // Display the NFC details
-                    tag != null
-                        ? Text('Transceive Result:\n$_result')
-                        : const Text('Empty NFC Tag'),
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      '0', // Change to a unique channel ID
+      'My App Notifications', // Change to a human-readable channel name
+      channelDescription:
+          'Notifications for My App', // Change to a description of your channel
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+    );
 
-                    StyledButton(
-                      noShadow: true,
-                      textColor: Colors.black,
-                      btnColor: const Color(0xffCECECE),
-                      btnText: "Cancel",
-                      onClick: () async {
-                        await FlutterNfcKit.finish();
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'ATTENDANCE',
+      tag != null ? 'Student Info:\n$_result' : 'Empty NFC Tag',
+      platformChannelSpecifics,
+      payload: 'item x',
     );
   }
 // Function to write NFC data
