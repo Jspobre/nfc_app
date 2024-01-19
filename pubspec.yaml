@@ -45,7 +45,7 @@ dependencies:
   ndef: ^0.3.3
   pdf: ^3.10.7
   firebase_database: ^10.4.0
-
+  flutter_local_notifications: ^16.3.1
   
 dev_dependencies:
   flutter_test:

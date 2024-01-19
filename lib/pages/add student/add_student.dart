@@ -131,57 +131,57 @@ class _AddStudentState extends State<AddStudent> {
                               const SizedBox(
                                 height: 16,
                               ),
-                              TextFieldContainer(
-                                label: "Irregular Student",
-                                inputWidget: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    RadioListTile<String>(
-                                      title: const Text(
-                                        'Yes',
-                                        style: TextStyle(
-                                            fontFamily: "Roboto",
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                      value: 'Yes',
-                                      groupValue: isIrregular,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          isIrregular = value!;
-                                          showErrorTextIrreg = false;
-                                        });
-                                      },
-                                      activeColor: Color(0xff16A637),
-                                    ),
-                                    RadioListTile<String>(
-                                      title: const Text(
-                                        'No',
-                                        style: TextStyle(
-                                            fontFamily: "Roboto",
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                      value: 'No',
-                                      groupValue: isIrregular,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          isIrregular = value!;
-                                          showErrorTextIrreg = false;
-                                        });
-                                      },
-                                      activeColor: Color(0xff16A637),
-                                    ),
-                                    showErrorTextIrreg == true
-                                        ? Text(
-                                            errorText,
-                                            style: TextStyle(
-                                                color: Color.fromARGB(
-                                                    255, 192, 0, 0),
-                                                fontSize: 12),
-                                          )
-                                        : const SizedBox(),
-                                  ],
-                                ),
-                              ),
+                              // TextFieldContainer(
+                              //   label: "Irregular Student",
+                              //   inputWidget: Column(
+                              //     crossAxisAlignment: CrossAxisAlignment.start,
+                              //     children: [
+                              //       RadioListTile<String>(
+                              //         title: const Text(
+                              //           'Yes',
+                              //           style: TextStyle(
+                              //               fontFamily: "Roboto",
+                              //               fontWeight: FontWeight.w400),
+                              //         ),
+                              //         value: 'Yes',
+                              //         groupValue: isIrregular,
+                              //         onChanged: (value) {
+                              //           setState(() {
+                              //             isIrregular = value!;
+                              //             showErrorTextIrreg = false;
+                              //           });
+                              //         },
+                              //         activeColor: Color(0xff16A637),
+                              //       ),
+                              //       RadioListTile<String>(
+                              //         title: const Text(
+                              //           'No',
+                              //           style: TextStyle(
+                              //               fontFamily: "Roboto",
+                              //               fontWeight: FontWeight.w400),
+                              //         ),
+                              //         value: 'No',
+                              //         groupValue: isIrregular,
+                              //         onChanged: (value) {
+                              //           setState(() {
+                              //             isIrregular = value!;
+                              //             showErrorTextIrreg = false;
+                              //           });
+                              //         },
+                              //         activeColor: Color(0xff16A637),
+                              //       ),
+                              //       showErrorTextIrreg == true
+                              //           ? Text(
+                              //               errorText,
+                              //               style: TextStyle(
+                              //                   color: Color.fromARGB(
+                              //                       255, 192, 0, 0),
+                              //                   fontSize: 12),
+                              //             )
+                              //           : const SizedBox(),
+                              //     ],
+                              //   ),
+                              // ),
                               const SizedBox(
                                 height: 16,
                               ),
@@ -481,15 +481,15 @@ class _AddStudentState extends State<AddStudent> {
   Future<void> handleSubmit(BuildContext context) async {
     // IF FORM IS EMPTY OR SKIPPED
     if (!_registrationFormKey.currentState!.validate() ||
-        isIrregular == null ||
+        // isIrregular == null ||
         selectedBlock == null ||
         selectedCourse == null ||
         selectedYearLevel == null) {
-      if (isIrregular == null) {
-        setState(() {
-          showErrorTextIrreg = true;
-        });
-      }
+      // if (isIrregular == null) {
+      //   setState(() {
+      //     showErrorTextIrreg = true;
+      //   });
+      // }
       if (selectedBlock == null) {
         setState(() {
           showErrorTextBlock = true;
@@ -514,7 +514,7 @@ class _AddStudentState extends State<AddStudent> {
       try {
         final studentNum = studentNumController.text;
         final studentName = studentNameController.text;
-        final isIrregStatus = isIrregular;
+        // final isIrregStatus = isIrregular;
         final courseName = selectedCourse;
         final yearLevel = selectedYearLevel;
         final block = selectedBlock;
@@ -547,15 +547,16 @@ class _AddStudentState extends State<AddStudent> {
         FirebaseFirestore.instance.collection('students').add({
           'student_num': studentNum,
           'full_name': studentName,
-          'isIrregular': isIrregStatus,
+          // 'isIrregular': isIrregStatus,
           'course': courseName,
           'year_level': yearLevel,
+          'nfc_written': 'false',
           'block': block
         }).then((_) {
           setState(() {
             studentNumController.clear();
             studentNameController.clear();
-            isIrregular = null;
+            // isIrregular = null;
             selectedCourse = null;
             selectedYearLevel = null;
             selectedBlock = null;
