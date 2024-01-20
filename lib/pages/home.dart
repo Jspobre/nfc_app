@@ -173,56 +173,47 @@ class _HomeState extends State<Home> {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
 
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings(
-            'nfc'); //this is found in android/app/src/main/res/drawable. Can change to other images
-    final InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
     if (tag == null || scannedData.isEmpty) {
       // Don't insert data if the NFC tag is empty
       return;
+    } else {
+      _databaseReference.push().set({
+        'timestamp': ServerValue.timestamp,
+        'tag_data': scannedData,
+      }).then((_) {
+        print('Data inserted successfully');
+      }).catchError((error) {
+        print('Error inserting data: $error');
+      });
+
+      // Split the scannedData to extract full name and student ID
+      List<String> dataParts = scannedData.split(' - ');
+      String fullName = dataParts[0]; // display only the full name
+
+      const AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+        '1',
+        'My App Notifications',
+        channelDescription: 'Notifications for My App',
+        importance: Importance.max,
+        priority: Priority.max,
+        fullScreenIntent: true,
+        ticker: 'ticker',
+      );
+
+      const NotificationDetails platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+      );
+
+      await flutterLocalNotificationsPlugin.show(
+        // details that are displayed in the notification
+        1,
+        'ATTENDANCE',
+        'Student name:\n$fullName',
+        platformChannelSpecifics,
+        payload: 'item x',
+      );
     }
-
-    _databaseReference.push().set({
-      'timestamp': ServerValue.timestamp,
-      'tag_data': scannedData,
-    }).then((_) {
-      print('Data inserted successfully');
-    }).catchError((error) {
-      print('Error inserting data: $error');
-    });
-
-    // Split the scannedData to extract full name and student ID
-    List<String> dataParts = scannedData.split(' - ');
-    String fullName = dataParts[0]; //display only the full name
-
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      //parameters to be set for the notification
-      '0',
-      'My App Notifications',
-      channelDescription: 'Notifications for My App',
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-    );
-
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-    );
-
-    await flutterLocalNotificationsPlugin.show(
-      //details that are displayed in the notification
-      0,
-      'ATTENDANCE',
-      'Student name:\n$fullName',
-      platformChannelSpecifics,
-      payload: 'item x',
-    );
   }
 
   @override

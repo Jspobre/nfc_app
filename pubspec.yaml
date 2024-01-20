@@ -51,7 +51,7 @@ dependencies:
   permission_handler: ^11.2.0
   firebase_database: ^10.4.0
   flutter_local_notifications: ^16.3.1
-
+  awesome_notifications: ^0.8.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
