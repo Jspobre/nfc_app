@@ -44,9 +44,14 @@ dependencies:
   flutter_nfc_kit: ^3.4.2
   ndef: ^0.3.3
   pdf: ^3.10.7
+  path_provider: ^2.1.2
+  open_file: ^3.3.2
+  url_launcher: ^6.2.3
+  printing: ^5.11.1
+  permission_handler: ^11.2.0
   firebase_database: ^10.4.0
   flutter_local_notifications: ^16.3.1
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -495,7 +495,7 @@ class _HomeState extends State<Home> {
                                     await FlutterNfcKit.finish();
                                     setState(() {
                                       tappedStudentInfo =
-                                          "${studentData['student_num']} - ${studentData['full_name']}";
+                                          "${studentData['full_name']} - ${studentData['block']} - ${studentData['year_level']} - ${studentData['course']} - ${studentData.id}";
                                     });
 
                                     showFloatingModalBottomSheet(
