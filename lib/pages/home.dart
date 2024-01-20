@@ -175,7 +175,7 @@ class _HomeState extends State<Home> {
 
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings(
-            'flutter_logo'); //this is found in android/app/src/main/res/drawable. Can change to other images
+            'nfc'); //this is found in android/app/src/main/res/drawable. Can change to other images
     final InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
@@ -214,7 +214,7 @@ class _HomeState extends State<Home> {
       //details that are displayed in the notification
       0,
       'ATTENDANCE',
-      tag != null ? 'Student Name:\n$fullName' : 'Empty NFC Tag',
+      tag != null ? 'Student name:\n$fullName' : 'Empty NFC Tag',
       platformChannelSpecifics,
       payload: 'item x',
     );
