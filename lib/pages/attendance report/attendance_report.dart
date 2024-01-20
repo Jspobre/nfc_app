@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nfc_app/api/attendance_pdf.dart';
+import 'package:nfc_app/model/attendance_data.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 
 class AttendanceReport extends StatefulWidget {
@@ -16,6 +19,13 @@ class _AttendanceReportState extends State<AttendanceReport> {
   String selectedCourse = "Bachelor of Science in Computer Science";
   String selectedYear = "1st Year";
   String selectedBlock = "A";
+  List<Map<String, dynamic>> studentData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAllStudent();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +35,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
     // Format the current date into "MONTH DAY, YEAR" format
     String formattedDate = DateFormat('MMMM dd, yyyy').format(selectedMonth);
 
+    print('student data: $studentData');
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.white10,
@@ -50,7 +61,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                         children: [
                           Text(
                             "Course:".toUpperCase(),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: "Roboto",
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -134,7 +145,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                         children: [
                           Text(
                             "Year Level".toUpperCase(),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: "Roboto",
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -206,7 +217,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                         children: [
                           Text(
                             "Block:".toUpperCase(),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: "Roboto",
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -285,9 +296,6 @@ class _AttendanceReportState extends State<AttendanceReport> {
                           setState(() {
                             monthValue--;
                           });
-                          // updateSelectedDate(dayValue, monthValue);
-                          print(dayValue);
-                          print(monthValue);
                         },
                         icon: const Icon(Icons.keyboard_double_arrow_left),
                         padding: EdgeInsets.zero,
@@ -298,9 +306,6 @@ class _AttendanceReportState extends State<AttendanceReport> {
                           setState(() {
                             dayValue--;
                           });
-                          // updateSelectedDate(dayValue, monthValue);
-                          print(dayValue);
-                          print(monthValue);
                         },
                         icon: const Icon(Icons.chevron_left),
                         padding: EdgeInsets.zero,
@@ -315,9 +320,6 @@ class _AttendanceReportState extends State<AttendanceReport> {
                           setState(() {
                             dayValue++;
                           });
-                          // updateSelectedDate(dayValue, monthValue);
-                          print(dayValue);
-                          print(monthValue);
                         },
                         icon: const Icon(Icons.chevron_right),
                         padding: EdgeInsets.zero,
@@ -328,9 +330,6 @@ class _AttendanceReportState extends State<AttendanceReport> {
                           setState(() {
                             monthValue++;
                           });
-                          // updateSelectedDate(dayValue, monthValue);
-                          print(dayValue);
-                          print(monthValue);
                         },
                         icon: const Icon(Icons.keyboard_double_arrow_right),
                         padding: EdgeInsets.zero,
@@ -344,99 +343,242 @@ class _AttendanceReportState extends State<AttendanceReport> {
                   ),
 
                   // TABLE DISPLAY
-                  // title
-                  // const Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     Expanded(
-                  //       child: Text(
-                  //         "Name",
-                  //         textAlign: TextAlign.center,
-                  //       ),
-                  //     ),
-                  //     Expanded(
-                  //       child: Text(
-                  //         "Time Arrived",
-                  //         textAlign: TextAlign.center,
-                  //       ),
-                  //     )
-                  //   ],
-                  // ),
                   // Display data here
-                  Table(
-                      border: TableBorder
-                          .all(), // Allows to add a border decoration around your table
-                      children: [
-                        TableRow(children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 4),
-                            child: Text(
-                              'Name',
-                              style: TextStyle(
-                                  fontFamily: "Roboto",
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 4),
-                            child: Text(
-                              'Time Arrived',
-                              style: TextStyle(
-                                  fontFamily: "Roboto",
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                        ]),
-                        TableRow(children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 4),
-                            child: Text(
-                              'Test',
-                              style: TextStyle(fontFamily: "Roboto"),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 4),
-                            child: Text(
-                              '9:00AM',
-                              style: TextStyle(fontFamily: "Roboto"),
-                            ),
-                          ),
-                        ]),
-                        TableRow(children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 4),
-                            child: Text(
-                              'Dummy',
-                              style: TextStyle(fontFamily: "Roboto"),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 4),
-                            child: Text(
-                              '10:00AM',
-                              style: TextStyle(fontFamily: "Roboto"),
-                            ),
-                          ),
-                        ]),
-                      ]),
+                  StreamBuilder(
+                      stream: FirebaseDatabase.instance.ref().onValue,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData &&
+                            !snapshot.hasError &&
+                            snapshot.data!.snapshot.value != null) {
+                          // Data is available
+                          var data = snapshot.data!.snapshot.value;
 
-                  // EXPORT BUTTON
-                  StyledButton(
-                      btnText: "Export",
-                      onClick: () async {
-                        try {
-                          await AttendancePdf.generate();
-                        } catch (e) {
-                          print(e);
+                          List<AttendanceData> attendanceData = [];
+
+                          if (data is Map && data.isNotEmpty) {
+                            attendanceData = data.entries.where((e) {
+                              List<String> tag_data =
+                                  e.value['tag_data'].toString().split(' - ');
+                              int timestamp = e.value['timestamp'];
+
+                              int indivStudentIndex = studentData.indexWhere(
+                                  (s) => s['full_name'] == tag_data[0]);
+
+                              // Filter based on selectedCourse, selectedYear,  selectedBlock, and selectedMonth
+                              bool courseFilter = selectedCourse == "All" ||
+                                  selectedCourse ==
+                                      studentData[indivStudentIndex]['course'];
+
+                              bool yearFilter = selectedYear == "All" ||
+                                  selectedYear ==
+                                      studentData[indivStudentIndex]
+                                          ['year_level'];
+
+                              bool blockFilter = selectedBlock == "All" ||
+                                  selectedBlock ==
+                                      studentData[indivStudentIndex]['block'];
+
+                              DateTime attendanceDateTime =
+                                  DateTime.fromMillisecondsSinceEpoch(
+                                      timestamp);
+
+                              bool dateFilter = selectedMonth.year ==
+                                      attendanceDateTime.year &&
+                                  selectedMonth.month ==
+                                      attendanceDateTime.month &&
+                                  selectedMonth.day == attendanceDateTime.day;
+
+                              return courseFilter &&
+                                  yearFilter &&
+                                  blockFilter &&
+                                  dateFilter;
+                            }).map((e) {
+                              List<String> tag_data =
+                                  e.value['tag_data'].toString().split(' - ');
+                              int timestamp = e.value['timestamp'];
+
+                              int indivStudentIndex = studentData.indexWhere(
+                                  (s) => s['full_name'] == tag_data[0]);
+
+                              print(indivStudentIndex);
+
+                              return AttendanceData(
+                                  docId: tag_data[1],
+                                  fullName: tag_data[0],
+                                  course: studentData[indivStudentIndex]
+                                      ['course'],
+                                  yrLevel: studentData[indivStudentIndex]
+                                      ['year_level'],
+                                  block: studentData[indivStudentIndex]
+                                      ['block'],
+                                  timestamp: timestamp);
+                            }).toList();
+                          }
+
+                          return Column(
+                            children: [
+                              Table(
+                                  columnWidths: const {
+                                    0: FlexColumnWidth(),
+                                    1: FixedColumnWidth(120.0),
+                                  },
+                                  border: TableBorder
+                                      .all(), // Allows to add a border decoration around your table
+                                  children: [
+                                    const TableRow(children: [
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 4),
+                                        child: Text(
+                                          'Name',
+                                          style: TextStyle(
+                                              fontFamily: "Roboto",
+                                              fontWeight: FontWeight.w500),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 4),
+                                        child: Text(
+                                          'Time Arrived',
+                                          style: TextStyle(
+                                              fontFamily: "Roboto",
+                                              fontWeight: FontWeight.w500),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ]),
+                                    if (attendanceData.isEmpty)
+                                      const TableRow(children: [
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 4),
+                                          child: Text(
+                                            "No data yet",
+                                            style: TextStyle(
+                                                fontFamily: "Roboto",
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 4),
+                                          child: Text(
+                                            "No data yet",
+                                            style: TextStyle(
+                                                fontFamily: "Roboto",
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      ]),
+                                    for (final data in attendanceData)
+                                      TableRow(children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 4),
+                                          child: Text(
+                                            data.fullName,
+                                            style: const TextStyle(
+                                                fontFamily: "Roboto",
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 4),
+                                          child: Text(
+                                            formatTime(DateTime
+                                                .fromMillisecondsSinceEpoch(
+                                                    data.timestamp)),
+                                            style: const TextStyle(
+                                                fontFamily: "Roboto",
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      ])
+                                  ]),
+                              // EXPORT BUTTON
+
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              StyledButton(
+                                  noShadow: true,
+                                  btnIcon: Icon(Icons.adobe),
+                                  btnText: "Export to Pdf",
+                                  onClick: () async {
+                                    try {
+                                      await AttendancePdf.generate(
+                                          attendanceData);
+                                    } catch (e) {
+                                      print("error generating pdf: $e");
+                                    }
+                                  })
+                            ],
+                          );
+                        } else if (snapshot.hasError) {
+                          // Handle error
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
+                        } else if (snapshot.data?.snapshot.value == null) {
+                          return Table(
+                              border: TableBorder
+                                  .all(), // Allows to add a border decoration around your table
+                              children: const [
+                                TableRow(children: [
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 4),
+                                    child: Text(
+                                      'Name',
+                                      style: TextStyle(
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 4),
+                                    child: Text(
+                                      'Time Arrived',
+                                      style: TextStyle(
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ]),
+                                TableRow(children: [
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 4),
+                                    child: Text(
+                                      'No Data Yet',
+                                      style: TextStyle(
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 4),
+                                    child: Text(
+                                      'No Data Yet',
+                                      style: TextStyle(
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ]),
+                              ]);
+                        } else {
+                          // Data is still loading
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
-                      })
+                      }),
                 ],
               ),
             ),
@@ -444,5 +586,33 @@ class _AttendanceReportState extends State<AttendanceReport> {
         ),
       ),
     );
+  }
+
+  Future fetchAllStudent() async {
+    try {
+      // Replace "your_collection" with the name of your Firestore collection
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('students').get();
+
+      // Loop through the documents in the collection
+      if (querySnapshot.docs.isNotEmpty) {
+        for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
+          // Access the data of each document
+          Map<String, dynamic> data =
+              documentSnapshot.data() as Map<String, dynamic>;
+
+          setState(() {
+            studentData.add(data);
+          });
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  String formatTime(DateTime dateTime) {
+    final formatter = DateFormat('h:mm a');
+    return formatter.format(dateTime);
   }
 }
