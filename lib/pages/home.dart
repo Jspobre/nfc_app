@@ -175,7 +175,7 @@ class _HomeState extends State<Home> {
 
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings(
-            'logo'); //this is found in android/app/src/main/res/drawable. Can change to other images
+            'flutter_logo'); //this is found in android/app/src/main/res/drawable. Can change to other images
     final InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
@@ -190,6 +190,10 @@ class _HomeState extends State<Home> {
     }).catchError((error) {
       print('Error inserting data: $error');
     });
+
+    // Split the scannedData to extract full name and student ID
+    List<String> dataParts = scannedData.split(' - ');
+    String fullName = dataParts[0]; //display only the full name
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
@@ -210,7 +214,7 @@ class _HomeState extends State<Home> {
       //details that are displayed in the notification
       0,
       'ATTENDANCE',
-      tag != null ? 'Student Info:\n$_result' : 'Empty NFC Tag',
+      tag != null ? 'Student Name:\n$fullName' : 'Empty NFC Tag',
       platformChannelSpecifics,
       payload: 'item x',
     );
@@ -333,123 +337,6 @@ class _HomeState extends State<Home> {
                     btnText: "Read",
                     onClick: () async {
                       await showInitialModal();
-                      // setState(() {
-                      //   _readResult == 'OK';
-                      // });
-
-                      // try {
-                      //   NFCTag tag = await FlutterNfcKit.poll();
-                      //   setState(() {
-                      //     _tag = tag;
-                      //   });
-                      //   await FlutterNfcKit.setIosAlertMessage(
-                      //       "Working on it...");
-                      //   _mifareResult = null;
-
-                      //   if (tag.standard == "ISO 14443-4 (Type B)") {
-                      //     String result1 =
-                      //         await FlutterNfcKit.transceive("00B0950000");
-                      //     String result2 = await FlutterNfcKit.transceive(
-                      //         "00A4040009A00000000386980701");
-                      //     setState(() {
-                      //       _result = '1: $result1\n2: $result2\n';
-                      //     });
-                      //   } else if (tag.type == NFCTagType.iso18092) {
-                      //     String result1 =
-                      //         await FlutterNfcKit.transceive("060080080100");
-                      //     setState(() {
-                      //       _result = '1: $result1\n';
-                      //     });
-                      //   } else if (tag.ndefAvailable ?? false) {
-                      //     var ndefRecords =
-                      //         await FlutterNfcKit.readNDEFRecords();
-                      //     var textContent = '';
-
-                      //     for (int i = 0; i < ndefRecords.length; i++) {
-                      //       if (ndefRecords[i] is ndef.TextRecord) {
-                      //         // Extract and concatenate text content from TextRecord
-                      //         String? recordText =
-                      //             (ndefRecords[i] as ndef.TextRecord).text;
-                      //         textContent += recordText ??
-                      //             ''; // Use the null-aware operator to handle null values
-                      //       }
-                      //     }
-
-                      //     setState(() {
-                      //       _result = ' $textContent';
-                      //     });
-                      //   } else if (tag.type == NFCTagType.webusb) {
-                      //     var r = await FlutterNfcKit.transceive(
-                      //         "00A4040006D27600012401");
-                      //     print(r);
-                      //   }
-                      // } catch (e) {
-                      //   setState(() {
-                      //     _result = 'error: $e';
-                      //   });
-                      // }
-
-                      // // Pretend that we are working
-                      // if (!kIsWeb) sleep(new Duration(seconds: 1));
-                      // await FlutterNfcKit.finish(iosAlertMessage: "Finished!");
-
-                      // Display the NFC details in a modal
-
-                      // showGeneralDialog(
-                      //   context: context,
-                      //   barrierColor: Colors.black.withOpacity(0.5),
-                      //   barrierDismissible: false,
-                      //   barrierLabel: '',
-                      //   transitionDuration: Duration(milliseconds: 400),
-                      //   pageBuilder: (context, animation1, animation2) {
-                      //     return Align(
-                      //       alignment: Alignment.center,
-                      //       child: Container(
-                      //         margin:
-                      //             EdgeInsets.only(top: 50, left: 12, right: 12),
-                      //         height: 300, // Adjust the height as needed
-                      //         child: Card(
-                      //           elevation: 8,
-                      //           shape: RoundedRectangleBorder(
-                      //             borderRadius: BorderRadius.circular(12),
-                      //           ),
-                      //           child: Padding(
-                      //             padding: const EdgeInsets.all(16.0),
-                      //             child: Column(
-                      //               mainAxisAlignment:
-                      //                   MainAxisAlignment.spaceAround,
-                      //               children: [
-                      //                 const SizedBox(),
-                      //                 Image.asset('lib/images/image 2.png'),
-                      //                 const Text(
-                      //                   "NFC Tag Details",
-                      //                   style: TextStyle(
-                      //                     fontSize: 17,
-                      //                   ),
-                      //                 ),
-                      //                 // Display the NFC details
-                      //                 _tag != null
-                      //                     ? Text(
-                      //                         '\nTransceive Result:\n$_result')
-                      //                     : const Text('No tag scanned yet.'),
-                      //                 StyledButton(
-                      //                   noShadow: true,
-                      //                   textColor: Colors.black,
-                      //                   btnColor: const Color(0xffCECECE),
-                      //                   btnText: "Cancel",
-                      //                   onClick: () async {
-                      //                     await FlutterNfcKit.finish();
-                      //                     Navigator.pop(context);
-                      //                   },
-                      //                 ),
-                      //               ],
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     );
-                      //   },
-                      // );
                     },
                     noShadow: true,
                     btnWidth: double.infinity,
@@ -495,7 +382,7 @@ class _HomeState extends State<Home> {
                                     await FlutterNfcKit.finish();
                                     setState(() {
                                       tappedStudentInfo =
-                                          "${studentData['full_name']} - ${studentData['block']} - ${studentData['year_level']} - ${studentData['course']} - ${studentData.id}";
+                                          "${studentData['full_name']} - ${studentData.id}";
                                     });
 
                                     showFloatingModalBottomSheet(
@@ -509,16 +396,6 @@ class _HomeState extends State<Home> {
                                     if (tag != null) {
                                       List<ndef.NDEFRecord> existingRecords =
                                           await FlutterNfcKit.readNDEFRecords();
-
-                                      // Check if there are any existing records on the NFC tag
-                                      // if (existingRecords.isNotEmpty) {
-                                      //   // Show a message or handle accordingly (e.g., don't proceed)
-                                      //   setState(() {
-                                      //     _writeResult =
-                                      //         'Error: NFC tag already contains a record.';
-                                      //   });
-                                      //   return;
-                                      // }
 
                                       // Create NDEF record with student details
                                       ndef.TextRecord ndefRecord =
