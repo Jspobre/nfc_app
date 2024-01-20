@@ -190,6 +190,7 @@ class _HomeState extends State<Home> {
       List<String> dataParts = scannedData.split(' - ');
       String fullName = dataParts[0]; // display only the full name
 
+      //chamged parameters for the local notifications
       const AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
         '1',
@@ -198,7 +199,7 @@ class _HomeState extends State<Home> {
         importance: Importance.max,
         priority: Priority.max,
         fullScreenIntent: true,
-        ticker: 'ticker',
+        ticker: 'NFC APP',
       );
 
       const NotificationDetails platformChannelSpecifics = NotificationDetails(
