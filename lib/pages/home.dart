@@ -575,6 +575,7 @@ class _HomeState extends State<Home> {
       print("Error resetting tag: $e");
     }
     if (_writeResult == "OK") {
+      Navigator.pop(context);
       showFloatingModalBottomSheet(
         dismissable: true,
         context: context,
