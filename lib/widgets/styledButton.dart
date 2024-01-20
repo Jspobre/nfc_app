@@ -48,7 +48,10 @@ class StyledButton extends StatelessWidget {
             backgroundColor: btnColor ?? const Color(0xff16A637),
             foregroundColor: textColor ?? Colors.white,
             textStyle: const TextStyle(
-                letterSpacing: 1, fontWeight: FontWeight.w500, fontSize: 16),
+                letterSpacing: 1,
+                fontWeight: FontWeight.w400,
+                fontSize: 19,
+                fontFamily: "Roboto"),
           ),
           icon: btnIcon,
           label: secondText != null
