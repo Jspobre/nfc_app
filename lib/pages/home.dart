@@ -182,6 +182,11 @@ class _HomeState extends State<Home> {
     );
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
+    if (tag == null || scannedData.isEmpty) {
+      // Don't insert data if the NFC tag is empty
+      return;
+    }
+
     _databaseReference.push().set({
       'timestamp': ServerValue.timestamp,
       'tag_data': scannedData,
@@ -214,7 +219,7 @@ class _HomeState extends State<Home> {
       //details that are displayed in the notification
       0,
       'ATTENDANCE',
-      tag != null ? 'Student name:\n$fullName' : 'Empty NFC Tag',
+      'Student name:\n$fullName',
       platformChannelSpecifics,
       payload: 'item x',
     );
@@ -346,12 +351,10 @@ class _HomeState extends State<Home> {
                   ),
                   StyledButton(
                     btnText: "Write",
-                    onClick: () {
+                    onClick: () async {
                       setState(() {
                         _writeResult = null;
                       });
-                      // BuildContext originalContext =
-                      //     context; // Store the original context
 
                       showBarModalBottomSheet(
                         expand: false,
@@ -376,110 +379,109 @@ class _HomeState extends State<Home> {
                             } else {
                               List<DocumentSnapshot> documents = snapshot.data!;
                               return ModalInsideModal(
-                                  studentsList: documents,
-                                  selectStudent:
-                                      (DocumentSnapshot studentData) async {
-                                    await FlutterNfcKit.finish();
-                                    setState(() {
-                                      tappedStudentInfo =
-                                          "${studentData['full_name']} - ${studentData.id}";
-                                    });
+                                studentsList: documents,
+                                selectStudent:
+                                    (DocumentSnapshot studentData) async {
+                                  await FlutterNfcKit.finish();
+                                  setState(() {
+                                    tappedStudentInfo =
+                                        "${studentData['full_name']} - ${studentData.id}";
+                                  });
 
-                                    showFloatingModalBottomSheet(
-                                      dismissable: false,
-                                      context: context,
-                                      builder: (context) => ScanModal(),
+                                  showFloatingModalBottomSheet(
+                                    dismissable: false,
+                                    context: context,
+                                    builder: (context) => ScanModal(),
+                                  );
+
+                                  NFCTag tag = await FlutterNfcKit.poll();
+                                  if (tag != null) {
+                                    List<ndef.NDEFRecord> existingRecords =
+                                        await FlutterNfcKit.readNDEFRecords();
+
+                                    ndef.TextRecord ndefRecord =
+                                        ndef.TextRecord(
+                                      text: tappedStudentInfo,
+                                      language: 'en',
                                     );
 
-                                    // Get the NFC tag and read existing NDEF records
-                                    NFCTag tag = await FlutterNfcKit.poll();
-                                    if (tag != null) {
-                                      List<ndef.NDEFRecord> existingRecords =
-                                          await FlutterNfcKit.readNDEFRecords();
+                                    await FlutterNfcKit.writeNDEFRecords(
+                                        [ndefRecord]);
 
-                                      // Create NDEF record with student details
-                                      ndef.TextRecord ndefRecord =
-                                          ndef.TextRecord(
-                                        text: tappedStudentInfo,
-                                        language: 'en',
-                                      );
+                                    await FirebaseFirestore.instance
+                                        .collection('students')
+                                        .doc(studentData.id)
+                                        .update({'nfc_written': true});
 
-                                      // Write the NDEF record to the NFC tag
-                                      await FlutterNfcKit.writeNDEFRecords(
-                                          [ndefRecord]);
+                                    setState(() {
+                                      tappedStudentInfo = '';
+                                      documents.remove(studentData);
+                                    });
 
-                                      // Update Firestore document to indicate that the information has been written
-                                      await FirebaseFirestore.instance
-                                          .collection('students')
-                                          .doc(studentData.id)
-                                          .update({'nfc_written': true});
+                                    setState(() {
+                                      _writeResult = 'OK';
+                                    });
+                                  } else {
+                                    setState(() {
+                                      _writeResult =
+                                          'Error: No NFC tag detected.';
+                                    });
+                                  }
 
-                                      // Remove the document from the list in the modal
-                                      setState(() {
-                                        tappedStudentInfo =
-                                            ''; // Clear the student info
-                                        documents.remove(studentData);
-                                      });
+                                  if (_writeResult == "OK") {
+                                    Navigator.popUntil(
+                                      context,
+                                      ModalRoute.withName(
+                                          '/'), // Pop until the home screen
+                                    );
 
-                                      setState(() {
-                                        _writeResult = 'OK';
-                                      });
-                                    } else {
-                                      setState(() {
-                                        _writeResult =
-                                            'Error: No NFC tag detected.';
-                                      });
-                                    }
-
-                                    if (_writeResult == "OK") {
-                                      Navigator.pop(
-                                          context); // close scan modal
-                                      showFloatingModalBottomSheet(
-                                        dismissable: true,
-                                        context: context,
-                                        builder: (context) => SizedBox(
-                                          height: 400,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              Image.asset(
-                                                  'lib/images/image 2.png'),
-                                              Text(
-                                                "Successfully wrote on the NFC Tag with student data",
-                                                style: TextStyle(
-                                                  fontSize: 17,
-                                                ),
-                                                textAlign: TextAlign.center,
+                                    showFloatingModalBottomSheet(
+                                      dismissable: true,
+                                      context: context,
+                                      builder: (context) => SizedBox(
+                                        height: 400,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Image.asset(
+                                                'lib/images/image 2.png'),
+                                            Text(
+                                              "Successfully wrote on the NFC Tag with student data",
+                                              style: TextStyle(
+                                                fontSize: 17,
                                               ),
-                                            ],
-                                          ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
                                         ),
-                                      );
-                                    } else {
-                                      showFloatingModalBottomSheet(
-                                        dismissable: true,
-                                        context: context,
-                                        builder: (context) => SizedBox(
-                                          height: 400,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              Image.asset(
-                                                  'lib/images/image 2.png'),
-                                              const Text(
-                                                "Failed to write on the NFC Tag, Please try again",
-                                                style: TextStyle(
-                                                  fontSize: 17,
-                                                ),
+                                      ),
+                                    );
+                                  } else {
+                                    showFloatingModalBottomSheet(
+                                      dismissable: true,
+                                      context: context,
+                                      builder: (context) => SizedBox(
+                                        height: 400,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Image.asset(
+                                                'lib/images/image 2.png'),
+                                            const Text(
+                                              "Failed to write on the NFC Tag, Please try again",
+                                              style: TextStyle(
+                                                fontSize: 17,
                                               ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
-                                      );
-                                    }
-                                  });
+                                      ),
+                                    );
+                                  }
+                                },
+                              );
                             }
                           },
                         ),
@@ -497,6 +499,14 @@ class _HomeState extends State<Home> {
     );
   }
 
+  String? extractDocumentIdFromContent(String content) {
+    // Trim leading and trailing whitespace from the extracted content
+    String trimmedContent = content.trim();
+
+    List<String> contentParts = trimmedContent.split(' - ');
+    return contentParts.length == 2 ? contentParts[1] : null;
+  }
+
   Future<void> writeEmptyRawRecordToNFC(BuildContext context) async {
     //! SHOW MODAL
     showFloatingModalBottomSheet(
@@ -504,85 +514,106 @@ class _HomeState extends State<Home> {
       builder: (context) => ScanModal(),
     );
 
-    resetTag().then(
-      (value) async {
-        Navigator.pop(context);
-
-        if (_writeResult == "OK") {
-          showFloatingModalBottomSheet(
-            dismissable: true,
-            context: context,
-            builder: (context) => SizedBox(
-              height: 400,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Image.asset('lib/images/image 2.png'),
-                  const Text(
-                    "Successfully reset the NFC Tag",
-                    style: TextStyle(
-                      fontSize: 17,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        } else {
-          showFloatingModalBottomSheet(
-            dismissable: true,
-            context: context,
-            builder: (context) => SizedBox(
-              height: 400,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Image.asset('lib/images/image 2.png'),
-                  const Text(
-                    "Failed to reset the NFC Tag, Please try again",
-                    style: TextStyle(
-                      fontSize: 17,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-      },
-    );
-  }
-
-  Future<void> resetTag() async {
-    await FlutterNfcKit
-        .finish(); // put in first to prevent opening pop up window of android which means next session doesnt end unless function is run again
-    //! SCAN AND WRITE
     try {
       NFCTag tag = await FlutterNfcKit.poll();
       setState(() {
         _tag = tag;
       });
-      if (tag.type == NFCTagType.mifare_ultralight ||
-          tag.type == NFCTagType.mifare_classic ||
-          tag.type == NFCTagType.iso15693) {
-        await FlutterNfcKit.writeNDEFRecords([
-          ndef.NDEFRecord(
+
+      if (tag.ndefAvailable ?? false) {
+        var ndefRecords = await FlutterNfcKit.readNDEFRecords();
+        var textContent = '';
+
+        for (int i = 0; i < ndefRecords.length; i++) {
+          if (ndefRecords[i] is ndef.TextRecord) {
+            String? recordText = (ndefRecords[i] as ndef.TextRecord).text;
+            textContent += recordText ?? '';
+          }
+        }
+
+        String? documentId = extractDocumentIdFromContent(textContent);
+
+        if (documentId != null) {
+          print('Document ID: $documentId');
+
+          // Reset the tag by writing an empty record
+          await FlutterNfcKit.writeNDEFRecords([
+            ndef.NDEFRecord(
               tnf: ndef.TypeNameFormat.values[0], // 0 for empty record
               type: ''.toBytes(),
               id: ''.toBytes(),
-              payload: ''.toBytes())
-        ]);
+              payload: ''.toBytes(),
+            ),
+          ]);
 
-        setState(() {
-          _writeResult = 'OK';
-        });
+          print('Empty tag written successfully.');
+
+          // Update Firestore document
+          await FirebaseFirestore.instance
+              .collection('students')
+              .doc(documentId)
+              .update({'nfc_written': false});
+
+          setState(() {
+            _writeResult = 'OK';
+          });
+
+          print('Firestore update successful.');
+        } else {
+          setState(() {
+            _writeResult = 'Error: ID not found in NFC tag data';
+          });
+          print('Error: ID not found in NFC tag data.');
+        }
       } else {
         setState(() {
-          _writeResult = 'error: NDEF not supported: ${tag.type}';
+          _writeResult = 'Error: NDEF not available on the tag';
         });
+        print('Error: NDEF not available on the tag.');
       }
     } catch (e) {
       print("Error resetting tag: $e");
+    }
+    if (_writeResult == "OK") {
+      showFloatingModalBottomSheet(
+        dismissable: true,
+        context: context,
+        builder: (context) => SizedBox(
+          height: 400,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Image.asset('lib/images/image 2.png'),
+              const Text(
+                "Successfully reset the NFC Tag",
+                style: TextStyle(
+                  fontSize: 17,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      showFloatingModalBottomSheet(
+        dismissable: true,
+        context: context,
+        builder: (context) => SizedBox(
+          height: 400,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Image.asset('lib/images/image 2.png'),
+              const Text(
+                "Failed to reset the NFC Tag, Please try again",
+                style: TextStyle(
+                  fontSize: 17,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
   }
 
