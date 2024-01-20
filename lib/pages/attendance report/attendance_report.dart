@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nfc_app/api/attendance_pdf.dart';
+import 'package:nfc_app/widgets/styledButton.dart';
 
 class AttendanceReport extends StatefulWidget {
   const AttendanceReport({super.key});
@@ -424,6 +426,17 @@ class _AttendanceReportState extends State<AttendanceReport> {
                           ),
                         ]),
                       ]),
+
+                  // EXPORT BUTTON
+                  StyledButton(
+                      btnText: "Export",
+                      onClick: () async {
+                        try {
+                          await AttendancePdf.generate();
+                        } catch (e) {
+                          print(e);
+                        }
+                      })
                 ],
               ),
             ),
