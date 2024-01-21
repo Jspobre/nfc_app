@@ -550,7 +550,7 @@ class _AddStudentState extends State<AddStudent> {
           // 'isIrregular': isIrregStatus,
           'course': courseName,
           'year_level': yearLevel,
-          'nfc_written': 'false',
+          'nfc_written': false,
           'block': block
         }).then((_) {
           setState(() {
