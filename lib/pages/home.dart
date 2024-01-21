@@ -20,6 +20,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:collection/collection.dart'; // Import the collection package for the `unmodifiableSet` function
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -38,7 +39,7 @@ class _HomeState extends State<Home> {
   String? tappedFullName;
   bool _scanning = false;
   final DatabaseReference _databaseReference = FirebaseDatabase.instance.ref();
-
+  String _lastScannedData = '';
   @override
   void initState() {
     super.initState();
@@ -179,6 +180,20 @@ class _HomeState extends State<Home> {
       // Don't insert data if the NFC tag is empty
       return;
     } else {
+      // Check if the same data already exists in the database
+      bool dataExists = await checkIfDataExists(scannedData);
+
+      // if (dataExists) {
+      //   print('Data already exists in the database: $scannedData');
+      //   return; // Skip inserting duplicate data
+      // }
+
+      // Check if the current scanned data is the same as the last scanned data
+      if (_lastScannedData == scannedData) {
+        print('Skipping consecutive duplicate data: $scannedData');
+        return;
+      }
+
       _databaseReference.push().set({
         'timestamp': ServerValue.timestamp,
         'tag_data': scannedData,
@@ -188,11 +203,14 @@ class _HomeState extends State<Home> {
         print('Error inserting data: $error');
       });
 
+      // Update the last scanned data
+      _lastScannedData = scannedData;
+
       // Split the scannedData to extract full name and student ID
       List<String> dataParts = scannedData.split(' - ');
       String fullName = dataParts[0]; // display only the full name
 
-      // Generate a unique ID based on the hash code of the scannedData to prevent overwrite of the previous notf
+      // Generate a unique ID based on the hash code of the scannedData to prevent overwrite of the previous notification
       int notificationId = scannedData.hashCode;
 
       // Configure the notification details
@@ -220,6 +238,19 @@ class _HomeState extends State<Home> {
         payload: 'item x',
       );
     }
+  }
+
+  Future<bool> checkIfDataExists(String scannedData) async {
+    DatabaseEvent event = await _databaseReference.once();
+
+    if (event.snapshot.value != null) {
+      // Explicitly cast the value to Map<dynamic, dynamic>
+      Map<dynamic, dynamic> entries =
+          (event.snapshot.value as Map<dynamic, dynamic>);
+      return entries.values.any((entry) => entry['tag_data'] == scannedData);
+    }
+
+    return false; // No data in the database, so no duplicate
   }
 
   @override
