@@ -18,6 +18,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -190,7 +192,10 @@ class _HomeState extends State<Home> {
       List<String> dataParts = scannedData.split(' - ');
       String fullName = dataParts[0]; // display only the full name
 
-      //chamged parameters for the local notifications
+      // Generate a unique ID based on the hash code of the scannedData to prevent overwrite of the previous notf
+      int notificationId = scannedData.hashCode;
+
+      // Configure the notification details
       const AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
         '1',
@@ -207,8 +212,8 @@ class _HomeState extends State<Home> {
       );
 
       await flutterLocalNotificationsPlugin.show(
-        // details that are displayed in the notification
-        1,
+        // Use the dynamically generated ID
+        notificationId,
         'ATTENDANCE',
         'Student name:\n$fullName',
         platformChannelSpecifics,
