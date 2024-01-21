@@ -16,6 +16,7 @@ class AttendanceReport extends StatefulWidget {
 class _AttendanceReportState extends State<AttendanceReport> {
   int dayValue = 0; //0 for today
   int monthValue = 0; //0 for this month
+  DateTime? datePickerSelected;
   String selectedCourse = "Bachelor of Science in Computer Science";
   String selectedYear = "1st Year";
   String selectedBlock = "A";
@@ -29,13 +30,13 @@ class _AttendanceReportState extends State<AttendanceReport> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime selectedDay = DateTime.now().add(Duration(days: dayValue));
+    DateTime selectedDay =
+        (datePickerSelected ?? DateTime.now()).add(Duration(days: dayValue));
     DateTime selectedMonth = DateTime(
         selectedDay.year, selectedDay.month + monthValue, selectedDay.day);
     // Format the current date into "MONTH DAY, YEAR" format
     String formattedDate = DateFormat('MMMM dd, yyyy').format(selectedMonth);
 
-    print('student data: $studentData');
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.white10,
@@ -311,9 +312,48 @@ class _AttendanceReportState extends State<AttendanceReport> {
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),
-                      Text(
-                        formattedDate,
-                        style: TextStyle(fontFamily: "Roboto", fontSize: 16),
+                      GestureDetector(
+                        onTap: () async {
+                          final DateTime? dateTime = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(3000),
+                            builder: (context, child) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: ColorScheme.light(
+                                    primary: Color(0xff16A637), // <-- SEE HERE
+                                    onPrimary:
+                                        Color(0xff252525), // <-- SEE HERE
+                                    onSurface:
+                                        Color(0xff252525), // <-- SEE HERE
+                                  ),
+                                  textButtonTheme: TextButtonThemeData(
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Color(
+                                          0xff252525), // button text color
+                                    ),
+                                  ),
+                                ),
+                                child: child!,
+                              );
+                            },
+                          );
+                          if (dateTime != null) {
+                            setState(
+                              () {
+                                datePickerSelected = dateTime;
+                                dayValue = 0;
+                                monthValue = 0;
+                              },
+                            );
+                          }
+                        },
+                        child: Text(
+                          formattedDate,
+                          style: TextStyle(fontFamily: "Roboto", fontSize: 16),
+                        ),
                       ),
                       IconButton(
                         onPressed: () {
@@ -354,65 +394,90 @@ class _AttendanceReportState extends State<AttendanceReport> {
                           var data = snapshot.data!.snapshot.value;
 
                           List<AttendanceData> attendanceData = [];
+                          List<String> uniqueFullNames = [];
 
                           if (data is Map && data.isNotEmpty) {
-                            attendanceData = data.entries.where((e) {
-                              List<String> tag_data =
-                                  e.value['tag_data'].toString().split(' - ');
-                              int timestamp = e.value['timestamp'];
+                            attendanceData = data.entries
+                                .where((e) {
+                                  //! filter attendance data first
+                                  List<String> tag_data = e.value['tag_data']
+                                      .toString()
+                                      .split(' - ');
+                                  int timestamp = e.value['timestamp'];
 
-                              int indivStudentIndex = studentData.indexWhere(
-                                  (s) => s['full_name'] == tag_data[0]);
+                                  int indivStudentIndex =
+                                      studentData.indexWhere(
+                                          (s) => s['full_name'] == tag_data[0]);
 
-                              // Filter based on selectedCourse, selectedYear,  selectedBlock, and selectedMonth
-                              bool courseFilter = selectedCourse == "All" ||
-                                  selectedCourse ==
-                                      studentData[indivStudentIndex]['course'];
+                                  // Filter based on selectedCourse, selectedYear,  selectedBlock, and selectedMonth
+                                  bool courseFilter = selectedCourse == "All" ||
+                                      selectedCourse ==
+                                          studentData[indivStudentIndex]
+                                              ['course'];
 
-                              bool yearFilter = selectedYear == "All" ||
-                                  selectedYear ==
+                                  bool yearFilter = selectedYear == "All" ||
+                                      selectedYear ==
+                                          studentData[indivStudentIndex]
+                                              ['year_level'];
+
+                                  bool blockFilter = selectedBlock == "All" ||
+                                      selectedBlock ==
+                                          studentData[indivStudentIndex]
+                                              ['block'];
+
+                                  DateTime attendanceDateTime =
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          timestamp);
+
+                                  bool dateFilter = selectedMonth.year ==
+                                          attendanceDateTime.year &&
+                                      selectedMonth.month ==
+                                          attendanceDateTime.month &&
+                                      selectedMonth.day ==
+                                          attendanceDateTime.day;
+
+                                  return courseFilter &&
+                                      yearFilter &&
+                                      blockFilter &&
+                                      dateFilter;
+                                })
+                                .map((e) {
+                                  //! get the data to be displayed
+                                  List<String> tag_data = e.value['tag_data']
+                                      .toString()
+                                      .split(' - ');
+                                  int timestamp = e.value['timestamp'];
+
+                                  int indivStudentIndex =
+                                      studentData.indexWhere(
+                                          (s) => s['full_name'] == tag_data[0]);
+
+                                  print(indivStudentIndex);
+
+                                  String fullName =
                                       studentData[indivStudentIndex]
-                                          ['year_level'];
+                                          ['full_name'];
 
-                              bool blockFilter = selectedBlock == "All" ||
-                                  selectedBlock ==
-                                      studentData[indivStudentIndex]['block'];
-
-                              DateTime attendanceDateTime =
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                      timestamp);
-
-                              bool dateFilter = selectedMonth.year ==
-                                      attendanceDateTime.year &&
-                                  selectedMonth.month ==
-                                      attendanceDateTime.month &&
-                                  selectedMonth.day == attendanceDateTime.day;
-
-                              return courseFilter &&
-                                  yearFilter &&
-                                  blockFilter &&
-                                  dateFilter;
-                            }).map((e) {
-                              List<String> tag_data =
-                                  e.value['tag_data'].toString().split(' - ');
-                              int timestamp = e.value['timestamp'];
-
-                              int indivStudentIndex = studentData.indexWhere(
-                                  (s) => s['full_name'] == tag_data[0]);
-
-                              print(indivStudentIndex);
-
-                              return AttendanceData(
-                                  docId: tag_data[1],
-                                  fullName: tag_data[0],
-                                  course: studentData[indivStudentIndex]
-                                      ['course'],
-                                  yrLevel: studentData[indivStudentIndex]
-                                      ['year_level'],
-                                  block: studentData[indivStudentIndex]
-                                      ['block'],
-                                  timestamp: timestamp);
-                            }).toList();
+                                  if (!uniqueFullNames.contains(fullName)) {
+                                    //! filter out duplicates and get first occurence
+                                    uniqueFullNames.add(fullName);
+                                    return AttendanceData(
+                                        docId: tag_data[1],
+                                        fullName: fullName,
+                                        course: studentData[indivStudentIndex]
+                                            ['course'],
+                                        yrLevel: studentData[indivStudentIndex]
+                                            ['year_level'],
+                                        block: studentData[indivStudentIndex]
+                                            ['block'],
+                                        timestamp: timestamp);
+                                  } else {
+                                    return null; // ? Duplicate, skip this entry
+                                  }
+                                })
+                                .whereType<
+                                    AttendanceData>() //! remove the null values
+                                .toList();
                           }
 
                           return Column(
@@ -449,7 +514,8 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                         ),
                                       ),
                                     ]),
-                                    if (attendanceData.isEmpty)
+                                    if (attendanceData
+                                        .isEmpty) //! Display the empty data
                                       const TableRow(children: [
                                         Padding(
                                           padding: EdgeInsets.symmetric(
@@ -472,7 +538,8 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                           ),
                                         ),
                                       ]),
-                                    for (final data in attendanceData)
+                                    for (final data
+                                        in attendanceData) //! Display the filtered data
                                       TableRow(children: [
                                         Padding(
                                           padding: const EdgeInsets.symmetric(
@@ -498,19 +565,19 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                         ),
                                       ])
                                   ]),
-                              // EXPORT BUTTON
 
+                              //! EXPORT BUTTON
                               const SizedBox(
                                 height: 10,
                               ),
                               StyledButton(
                                   noShadow: true,
-                                  btnIcon: Icon(Icons.adobe),
+                                  btnIcon: Icon(Icons.picture_as_pdf),
                                   btnText: "Export to Pdf",
                                   onClick: () async {
                                     try {
                                       await AttendancePdf.generate(
-                                          attendanceData);
+                                          attendanceData); //! Pass the data
                                     } catch (e) {
                                       print("error generating pdf: $e");
                                     }
