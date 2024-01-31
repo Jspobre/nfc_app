@@ -51,7 +51,7 @@ class ModalInsideModal extends StatelessWidget {
                     children: [
                       Text(studentData['full_name']),
                       Text(
-                          '${course == "Bachelor of Science in Information Technology" ? "BSIT" : (course == "Bachelor of Science in Computer Science" ? "BSCS" : (course == "Bachelor of Science in Information System" ? "BSIS" : "BSIT - Anim"))} ${yrLevel == '4th Year' ? "4" : (yrLevel == "3rd Year" ? "3" : (yrLevel == "2nd Year" ? "2" : "1"))}${studentData['block']}')
+                          '${course == "Bachelor of Science in Information Technology" ? "BSIT" : course == "Bachelor of Science in Computer Science" ? "BSCS" : course == "Bachelor of Science in Information System" ? "BSIS" : course == "Bachelor of Science in Electronics Engineering" ? "BSECE" : course == "Bachelor of Science in Computer Engineering" ? "BSCpE" : course == "Bachelor of Elementary Education" ? "BEEd" : course == "Bachelor of Secondary Education major in Math" ? "BSEd-Math" : course == "Bachelor of Secondary Education major in English" ? "BSEd-English" : course == "Bachelor of Technology and Livelihood Education major in ICT" ? "BTL-ICT" : course == "Bachelor of Technology and Livelihood Education major in HE" ? "BTL-HE" : course == "Bachelor of Science in Automotive Technology" ? "BSAT" : course == "Bachelor of Science in Electronics Technology" ? "BSEET" : course == "Bachelor of Science in Entrepreneurship" ? "BSEntrep" : course == "Bachelor of Science in Nursing" ? "BSN" : "Unknown abbreviation"} ${yrLevel == '4th Year' ? "4" : (yrLevel == "3rd Year" ? "3" : (yrLevel == "2nd Year" ? "2" : "1"))}${studentData['block']}')
                     ],
                   ),
                   onTap: () {
