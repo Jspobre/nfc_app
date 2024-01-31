@@ -64,7 +64,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                             "Course:".toUpperCase(),
                             style: const TextStyle(
                               fontFamily: "Roboto",
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -136,6 +136,147 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                         fontSize: 12),
                                   ),
                                 ),
+                                DropdownMenuItem<String>(
+                                  value:
+                                      "Bachelor of Science in Electronics Engineering",
+                                  child: Text(
+                                    "BSEE",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value:
+                                      "Bachelor of Science in Computer Engineering",
+                                  child: Text(
+                                    "BSCoE",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value: "Bachelor of Elementary Education",
+                                  child: Text(
+                                    "BEEd",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value:
+                                      "Bachelor of Secondary Education major in Math",
+                                  child: Text(
+                                    "BSEd - Math",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value:
+                                      "Bachelor of Secondary Education major in English",
+                                  child: Text(
+                                    "BSEd - English",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value:
+                                      "Bachelor of Technology and Livelihood Education major in ICT",
+                                  child: Text(
+                                    "BTLED - ICT",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value:
+                                      "Bachelor of Technology and Livelihood Education major in HE",
+                                  child: Text(
+                                    "BTLED - HE",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value:
+                                      "Bachelor of Science in Automotive Technology",
+                                  child: Text(
+                                    "BSAT",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value:
+                                      "Bachelor of Science in Electronics Technology",
+                                  child: Text(
+                                    "BSET",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value:
+                                      "Bachelor of Science in Entrepreneurship",
+                                  child: Text(
+                                    "BSEntrep",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                DropdownMenuItem<String>(
+                                  value: "Bachelor of Science in Nursing",
+                                  child: Text(
+                                    "BSN",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -145,10 +286,10 @@ class _AttendanceReportState extends State<AttendanceReport> {
                       Row(
                         children: [
                           Text(
-                            "Year Level".toUpperCase(),
+                            "Yr Level".toUpperCase(),
                             style: const TextStyle(
                               fontFamily: "Roboto",
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -174,7 +315,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                     "1",
                                     style: TextStyle(
                                         fontFamily: "Roboto",
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400),
                                   ),
                                 ),
@@ -184,7 +325,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                     "2",
                                     style: TextStyle(
                                         fontFamily: "Roboto",
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400),
                                   ),
                                 ),
@@ -194,7 +335,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                     "3",
                                     style: TextStyle(
                                         fontFamily: "Roboto",
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400),
                                   ),
                                 ),
@@ -204,7 +345,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                     "4",
                                     style: TextStyle(
                                         fontFamily: "Roboto",
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400),
                                   ),
                                 ),
@@ -220,7 +361,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                             "Block:".toUpperCase(),
                             style: const TextStyle(
                               fontFamily: "Roboto",
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -246,7 +387,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                     "A",
                                     style: TextStyle(
                                         fontFamily: "Roboto",
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400),
                                   ),
                                 ),
@@ -256,7 +397,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                     "B",
                                     style: TextStyle(
                                         fontFamily: "Roboto",
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400),
                                   ),
                                 ),
@@ -266,7 +407,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                     "C",
                                     style: TextStyle(
                                         fontFamily: "Roboto",
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400),
                                   ),
                                 ),
@@ -276,7 +417,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                     "D",
                                     style: TextStyle(
                                         fontFamily: "Roboto",
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400),
                                   ),
                                 ),
@@ -577,7 +718,8 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                   onClick: () async {
                                     try {
                                       await AttendancePdf.generate(
-                                          attendanceData); //! Pass the data
+                                          attendanceData,
+                                          formattedDate); //! Pass the data
                                     } catch (e) {
                                       print("error generating pdf: $e");
                                     }

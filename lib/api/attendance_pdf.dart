@@ -8,7 +8,8 @@ import 'package:open_file/open_file.dart';
 import 'package:printing/printing.dart';
 
 class AttendancePdf {
-  static Future<void> generate(List<AttendanceData> attendanceData) async {
+  static Future<void> generate(
+      List<AttendanceData> attendanceData, String formattedDate) async {
     final pdf = Document();
 
     final buLogo = MemoryImage(
@@ -23,7 +24,8 @@ class AttendancePdf {
             await PdfGoogleFonts.robotoBold(),
             await PdfGoogleFonts.robotoItalic(),
           ),
-          header: (Context context) => _buildHeader(context, buLogo),
+          header: (Context context) =>
+              _buildHeader(context, buLogo, formattedDate),
           footer: _buildFooter,
           build: (context) {
             final List<List<String>> tableData = [];
@@ -86,7 +88,8 @@ class AttendancePdf {
     AttendancePdf.saveDocument(name: "attendance_pdf.pdf", pdf: pdf);
   }
 
-  static Widget _buildHeader(Context context, MemoryImage buLogo) {
+  static Widget _buildHeader(
+      Context context, MemoryImage buLogo, String formattedDate) {
     return Column(
       children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -123,7 +126,12 @@ class AttendancePdf {
               "ATTENDANCE SHEET",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 5),
+            Text(
+              formattedDate,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
+            ),
+            SizedBox(height: 3),
             Container(
               height: 1,
               width: 150,
