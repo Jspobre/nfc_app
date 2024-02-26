@@ -176,6 +176,15 @@ class _HomeState extends State<Home> {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
 
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings(
+            'nfc'); //this is found in android/app/src/main/res/drawable. Can change to other images
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
     if (tag == null || scannedData.isEmpty) {
       // Don't insert data if the NFC tag is empty
       return;
