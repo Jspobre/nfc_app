@@ -1,4 +1,6 @@
 // import 'package:flutter/cupertino.dart';
+// ignore_for_file: unused_import
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:ndef/ndef.dart' as ndef;
 import 'package:ndef/utilities.dart';
+import 'package:nfc_app/pages/add%20schedule/add_schedule.dart';
 import 'package:nfc_app/pages/add%20student/add_student.dart';
 import 'package:nfc_app/pages/attendance%20report/attendance_report.dart';
 import 'package:nfc_app/widgets/bottom%20sheet%20modal/floating_modal.dart';
@@ -21,6 +24,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:collection/collection.dart'; // Import the collection package for the `unmodifiableSet` function
+import 'package:nfc_app/pages/add%20subject/add_subject.dart';
+import 'package:nfc_app/pages/add%20schedule/add_schedule.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -276,7 +281,24 @@ class _HomeState extends State<Home> {
             icon: Image.asset('lib/images/image 3.png'),
             itemBuilder: (BuildContext context) {
               List<PopupMenuEntry<String>> items = [];
-
+              items.add(
+                const PopupMenuItem<String>(
+                  value: 'addsubject',
+                  child: Text(
+                    'Add Subject',
+                    style: TextStyle(fontFamily: "Roboto"),
+                  ),
+                ),
+              );
+              items.add(
+                const PopupMenuItem<String>(
+                  value: 'addschedule',
+                  child: Text(
+                    'Add Schedule',
+                    style: TextStyle(fontFamily: "Roboto"),
+                  ),
+                ),
+              );
               items.add(
                 const PopupMenuItem<String>(
                   value: 'addstudent',
@@ -309,6 +331,20 @@ class _HomeState extends State<Home> {
             },
             onSelected: (String value) {
               switch (value) {
+                case 'addsubject':
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return AddSubject();
+                    }),
+                  );
+                  break;
+                case 'addschedule':
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return AddSchedule();
+                    }),
+                  );
+                  break;
                 case 'addstudent':
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (BuildContext context) {
