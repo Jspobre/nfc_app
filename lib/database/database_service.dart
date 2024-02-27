@@ -32,4 +32,16 @@ class DatabaseService {
 
   Future<void> create(Database database, int version) async =>
       await NfcDB().createTable(database);
+
+  Future<void> insertSubject(String subjectName) async {
+    // Get a reference to the database
+    final db = await database;
+
+    // Insert the subject into the subjects table
+    await db.insert(
+      'subjects',
+      {'subject_name': subjectName},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
 }
