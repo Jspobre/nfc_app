@@ -54,6 +54,7 @@ dependencies:
   awesome_notifications: ^0.8.2
   crypto: ^3.0.3
   sqflite: ^2.3.2
+  flutter_riverpod: ^2.4.10
 
 dev_dependencies:
   flutter_test:

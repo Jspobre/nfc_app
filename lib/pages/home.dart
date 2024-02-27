@@ -264,7 +264,12 @@ class _HomeState extends State<Home> {
         centerTitle: true,
         actions: [
           PopupMenuButton<String>(
-            icon: Image.asset('lib/images/image 3.png'),
+            icon: Icon(
+              Icons.menu_rounded,
+              size: 30,
+              color: Color(0xff16A637),
+            ),
+            // icon: Image.asset('lib/images/image 3.png'),
             itemBuilder: (BuildContext context) {
               List<PopupMenuEntry<String>> items = [];
 

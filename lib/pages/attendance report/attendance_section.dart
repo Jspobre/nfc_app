@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nfc_app/api/attendance_pdf.dart';
 import 'package:nfc_app/model/attendance_data.dart';
+import 'package:nfc_app/pages/attendance%20report/filter_page.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 
 class AttendanceSection extends StatefulWidget {
@@ -44,380 +45,403 @@ class _AttendanceSectionState extends State<AttendanceSection> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    // COURSE SELECTER
-                    Row(
-                      children: [
-                        Text(
-                          "Course:".toUpperCase(),
-                          style: const TextStyle(
-                            fontFamily: "Roboto",
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: StyledButton(
+                    btnText: "Filters",
+                    onClick: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => FilterPage(),
                         ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        // Dropdown
-                        SizedBox(
-                          width: 65,
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: selectedCourse, // Current selected value
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedCourse =
-                                    newValue ?? ''; // Update the selected value
-                              });
-                            },
-                            items: const [
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Science in Computer Science",
-                                child: Text(
-                                  "BSCS",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Science in Information System",
-                                child: Text(
-                                  "BSIS",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Science in Information Technology",
-                                child: Text(
-                                  "BSIT",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Science in Information Technology major in Animation",
-                                child: Text(
-                                  "BSIT - Animation",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Science in Electronics Engineering",
-                                child: Text(
-                                  "BSEE",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Science in Computer Engineering",
-                                child: Text(
-                                  "BSCoE",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value: "Bachelor of Elementary Education",
-                                child: Text(
-                                  "BEEd",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Secondary Education major in Math",
-                                child: Text(
-                                  "BSEd - Math",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Secondary Education major in English",
-                                child: Text(
-                                  "BSEd - English",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Technology and Livelihood Education major in ICT",
-                                child: Text(
-                                  "BTLED - ICT",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Technology and Livelihood Education major in HE",
-                                child: Text(
-                                  "BTLED - HE",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Science in Automotive Technology",
-                                child: Text(
-                                  "BSAT",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Science in Electronics Technology",
-                                child: Text(
-                                  "BSET",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value:
-                                    "Bachelor of Science in Entrepreneurship",
-                                child: Text(
-                                  "BSEntrep",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value: "Bachelor of Science in Nursing",
-                                child: Text(
-                                  "BSN",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    // YEAR LEVEL SELECTOR
-                    Row(
-                      children: [
-                        Text(
-                          "Yr Level".toUpperCase(),
-                          style: const TextStyle(
-                            fontFamily: "Roboto",
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        // Dropdown
-                        SizedBox(
-                          width: 35,
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: selectedYear, // Current selected value
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedYear =
-                                    newValue ?? ''; // Update the selected value
-                              });
-                            },
-                            items: const [
-                              DropdownMenuItem<String>(
-                                value: "1st Year",
-                                child: Text(
-                                  "1",
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value: "2nd Year",
-                                child: Text(
-                                  "2",
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value: "3rd Year",
-                                child: Text(
-                                  "3",
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value: "4th Year",
-                                child: Text(
-                                  "4",
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    // BLOCK SELECTOR
-                    Row(
-                      children: [
-                        Text(
-                          "Block:".toUpperCase(),
-                          style: const TextStyle(
-                            fontFamily: "Roboto",
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        // Dropdown
-                        SizedBox(
-                          width: 35,
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: selectedBlock, // Current selected value
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedBlock =
-                                    newValue ?? ''; // Update the selected value
-                              });
-                            },
-                            items: const [
-                              DropdownMenuItem<String>(
-                                value: "A",
-                                child: Text(
-                                  "A",
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value: "B",
-                                child: Text(
-                                  "B",
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value: "C",
-                                child: Text(
-                                  "C",
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                              DropdownMenuItem<String>(
-                                value: "D",
-                                child: Text(
-                                  "D",
-                                  style: TextStyle(
-                                      fontFamily: "Roboto",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      );
+                    },
+                    btnColor: Colors.white,
+                    btnIcon: Icon(Icons.tune),
+                    iconOnRight: true,
+                    noShadow: true,
+                    borderRadius: BorderRadius.circular(50),
+                    textSize: 16,
+                    textColor: Colors.black,
+                    isBorder: true,
+                    padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    btnHeight: 40,
+                  ),
                 ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //   children: [
+                //     // COURSE SELECTER
+                //     Row(
+                //       children: [
+                //         Text(
+                //           "Course:".toUpperCase(),
+                //           style: const TextStyle(
+                //             fontFamily: "Roboto",
+                //             fontSize: 14,
+                //             fontWeight: FontWeight.w500,
+                //           ),
+                //         ),
+                //         const SizedBox(
+                //           width: 10,
+                //         ),
+                //         // Dropdown
+                //         SizedBox(
+                //           width: 65,
+                //           child: DropdownButton<String>(
+                //             isExpanded: true,
+                //             value: selectedCourse, // Current selected value
+                //             onChanged: (String? newValue) {
+                //               setState(() {
+                //                 selectedCourse =
+                //                     newValue ?? ''; // Update the selected value
+                //               });
+                //             },
+                //             items: const [
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Science in Computer Science",
+                //                 child: Text(
+                //                   "BSCS",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Science in Information System",
+                //                 child: Text(
+                //                   "BSIS",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Science in Information Technology",
+                //                 child: Text(
+                //                   "BSIT",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Science in Information Technology major in Animation",
+                //                 child: Text(
+                //                   "BSIT - Animation",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Science in Electronics Engineering",
+                //                 child: Text(
+                //                   "BSEE",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Science in Computer Engineering",
+                //                 child: Text(
+                //                   "BSCoE",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value: "Bachelor of Elementary Education",
+                //                 child: Text(
+                //                   "BEEd",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Secondary Education major in Math",
+                //                 child: Text(
+                //                   "BSEd - Math",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Secondary Education major in English",
+                //                 child: Text(
+                //                   "BSEd - English",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Technology and Livelihood Education major in ICT",
+                //                 child: Text(
+                //                   "BTLED - ICT",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Technology and Livelihood Education major in HE",
+                //                 child: Text(
+                //                   "BTLED - HE",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Science in Automotive Technology",
+                //                 child: Text(
+                //                   "BSAT",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Science in Electronics Technology",
+                //                 child: Text(
+                //                   "BSET",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value:
+                //                     "Bachelor of Science in Entrepreneurship",
+                //                 child: Text(
+                //                   "BSEntrep",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value: "Bachelor of Science in Nursing",
+                //                 child: Text(
+                //                   "BSN",
+                //                   overflow: TextOverflow.ellipsis,
+                //                   maxLines: 1,
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12),
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //     // YEAR LEVEL SELECTOR
+                //     Row(
+                //       children: [
+                //         Text(
+                //           "Yr Level".toUpperCase(),
+                //           style: const TextStyle(
+                //             fontFamily: "Roboto",
+                //             fontSize: 14,
+                //             fontWeight: FontWeight.w500,
+                //           ),
+                //         ),
+                //         const SizedBox(
+                //           width: 10,
+                //         ),
+                //         // Dropdown
+                //         SizedBox(
+                //           width: 35,
+                //           child: DropdownButton<String>(
+                //             isExpanded: true,
+                //             value: selectedYear, // Current selected value
+                //             onChanged: (String? newValue) {
+                //               setState(() {
+                //                 selectedYear =
+                //                     newValue ?? ''; // Update the selected value
+                //               });
+                //             },
+                //             items: const [
+                //               DropdownMenuItem<String>(
+                //                 value: "1st Year",
+                //                 child: Text(
+                //                   "1",
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontSize: 14,
+                //                       fontWeight: FontWeight.w400),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value: "2nd Year",
+                //                 child: Text(
+                //                   "2",
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontSize: 14,
+                //                       fontWeight: FontWeight.w400),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value: "3rd Year",
+                //                 child: Text(
+                //                   "3",
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontSize: 14,
+                //                       fontWeight: FontWeight.w400),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value: "4th Year",
+                //                 child: Text(
+                //                   "4",
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontSize: 14,
+                //                       fontWeight: FontWeight.w400),
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //     // BLOCK SELECTOR
+                //     Row(
+                //       children: [
+                //         Text(
+                //           "Block:".toUpperCase(),
+                //           style: const TextStyle(
+                //             fontFamily: "Roboto",
+                //             fontSize: 14,
+                //             fontWeight: FontWeight.w500,
+                //           ),
+                //         ),
+                //         const SizedBox(
+                //           width: 10,
+                //         ),
+                //         // Dropdown
+                //         SizedBox(
+                //           width: 35,
+                //           child: DropdownButton<String>(
+                //             isExpanded: true,
+                //             value: selectedBlock, // Current selected value
+                //             onChanged: (String? newValue) {
+                //               setState(() {
+                //                 selectedBlock =
+                //                     newValue ?? ''; // Update the selected value
+                //               });
+                //             },
+                //             items: const [
+                //               DropdownMenuItem<String>(
+                //                 value: "A",
+                //                 child: Text(
+                //                   "A",
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontSize: 14,
+                //                       fontWeight: FontWeight.w400),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value: "B",
+                //                 child: Text(
+                //                   "B",
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontSize: 14,
+                //                       fontWeight: FontWeight.w400),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value: "C",
+                //                 child: Text(
+                //                   "C",
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontSize: 14,
+                //                       fontWeight: FontWeight.w400),
+                //                 ),
+                //               ),
+                //               DropdownMenuItem<String>(
+                //                 value: "D",
+                //                 child: Text(
+                //                   "D",
+                //                   style: TextStyle(
+                //                       fontFamily: "Roboto",
+                //                       fontSize: 14,
+                //                       fontWeight: FontWeight.w400),
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ],
+                // ),
 
                 // DATE SELECTOR
                 Row(
@@ -611,7 +635,8 @@ class _AttendanceSectionState extends State<AttendanceSection> {
                             Table(
                                 columnWidths: const {
                                   0: FlexColumnWidth(),
-                                  1: FixedColumnWidth(120.0),
+                                  1: FixedColumnWidth(65.0),
+                                  2: FixedColumnWidth(100.0),
                                 },
                                 border: TableBorder
                                     .all(), // Allows to add a border decoration around your table
@@ -630,7 +655,18 @@ class _AttendanceSectionState extends State<AttendanceSection> {
                                     ),
                                     Padding(
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 4),
+                                          horizontal: 4, vertical: 4),
+                                      child: Text(
+                                        'Status',
+                                        style: TextStyle(
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.w500),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 4, vertical: 4),
                                       child: Text(
                                         'Time Arrived',
                                         style: TextStyle(
@@ -654,10 +690,20 @@ class _AttendanceSectionState extends State<AttendanceSection> {
                                         ),
                                       ),
                                       Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 16, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 4, vertical: 4),
                                         child: Text(
-                                          "No data yet",
+                                          'Absent',
+                                          style: const TextStyle(
+                                              fontFamily: "Roboto",
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 4, vertical: 4),
+                                        child: Text(
+                                          "",
                                           style: TextStyle(
                                               fontFamily: "Roboto",
                                               fontWeight: FontWeight.w500),
@@ -679,7 +725,17 @@ class _AttendanceSectionState extends State<AttendanceSection> {
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 16, vertical: 4),
+                                            horizontal: 4, vertical: 4),
+                                        child: Text(
+                                          'Absent',
+                                          style: const TextStyle(
+                                              fontFamily: "Roboto",
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 4, vertical: 4),
                                         child: Text(
                                           formatTime(DateTime
                                               .fromMillisecondsSinceEpoch(
@@ -699,6 +755,7 @@ class _AttendanceSectionState extends State<AttendanceSection> {
                             StyledButton(
                                 noShadow: true,
                                 btnIcon: Icon(Icons.picture_as_pdf),
+                                iconOnRight: true,
                                 btnText: "Export to Pdf",
                                 onClick: () async {
                                   try {

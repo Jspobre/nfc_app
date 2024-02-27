@@ -45,7 +45,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
         appBar: AppBar(
           surfaceTintColor: Colors.white10,
           title: const Text(
-            "Attendance Report",
+            "Attendance",
             style: TextStyle(fontFamily: "Roboto", fontSize: 18),
           ),
           centerTitle: true,
