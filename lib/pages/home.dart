@@ -281,7 +281,8 @@ class _HomeState extends State<Home> {
             icon: Icon(
               Icons.menu_rounded,
               size: 30,
-              color: Color(0xff16A637),
+              // color: Color(0xff16A637),
+              color: Colors.black,
             ),
             // icon: Image.asset('lib/images/image 3.png'),
             itemBuilder: (BuildContext context) {

@@ -1,783 +1,270 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:nfc_app/api/attendance_pdf.dart';
+import 'package:nfc_app/database/database_service.dart';
 import 'package:nfc_app/model/attendance_data.dart';
+import 'package:nfc_app/model/fetch_data.dart';
 import 'package:nfc_app/pages/attendance%20report/filter_page.dart';
+import 'package:nfc_app/provider/attendanceData_provider.dart';
+import 'package:nfc_app/provider/date_provider.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 
-class AttendanceSection extends StatefulWidget {
+class AttendanceSection extends ConsumerWidget {
   const AttendanceSection({super.key});
 
   @override
-  State<AttendanceSection> createState() => _AttendanceSectionState();
-}
-
-class _AttendanceSectionState extends State<AttendanceSection> {
-  int dayValue = 0; //0 for today
-  int monthValue = 0; //0 for this month
-  DateTime? datePickerSelected;
-  String selectedCourse = "Bachelor of Science in Computer Science";
-  String selectedYear = "1st Year";
-  String selectedBlock = "A";
-  List<Map<String, dynamic>> studentData = [];
-
-  @override
-  void initState() {
-    super.initState();
-    fetchAllStudent();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    DateTime selectedDay =
-        (datePickerSelected ?? DateTime.now()).add(Duration(days: dayValue));
-    DateTime selectedMonth = DateTime(
-        selectedDay.year, selectedDay.month + monthValue, selectedDay.day);
-    // Format the current date into "MONTH DAY, YEAR" format
-    String formattedDate = DateFormat('MMMM dd, yyyy').format(selectedMonth);
+  Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
       child: SingleChildScrollView(
         child: SizedBox(
           width: double.infinity,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: StyledButton(
-                    btnText: "Filters",
-                    onClick: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => FilterPage(),
-                        ),
-                      );
-                    },
-                    btnColor: Colors.white,
-                    btnIcon: Icon(Icons.tune),
-                    iconOnRight: true,
-                    noShadow: true,
-                    borderRadius: BorderRadius.circular(50),
-                    textSize: 16,
-                    textColor: Colors.black,
-                    isBorder: true,
-                    padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    btnHeight: 40,
-                  ),
-                ),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //   children: [
-                //     // COURSE SELECTER
-                //     Row(
-                //       children: [
-                //         Text(
-                //           "Course:".toUpperCase(),
-                //           style: const TextStyle(
-                //             fontFamily: "Roboto",
-                //             fontSize: 14,
-                //             fontWeight: FontWeight.w500,
-                //           ),
-                //         ),
-                //         const SizedBox(
-                //           width: 10,
-                //         ),
-                //         // Dropdown
-                //         SizedBox(
-                //           width: 65,
-                //           child: DropdownButton<String>(
-                //             isExpanded: true,
-                //             value: selectedCourse, // Current selected value
-                //             onChanged: (String? newValue) {
-                //               setState(() {
-                //                 selectedCourse =
-                //                     newValue ?? ''; // Update the selected value
-                //               });
-                //             },
-                //             items: const [
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Science in Computer Science",
-                //                 child: Text(
-                //                   "BSCS",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Science in Information System",
-                //                 child: Text(
-                //                   "BSIS",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Science in Information Technology",
-                //                 child: Text(
-                //                   "BSIT",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Science in Information Technology major in Animation",
-                //                 child: Text(
-                //                   "BSIT - Animation",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Science in Electronics Engineering",
-                //                 child: Text(
-                //                   "BSEE",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Science in Computer Engineering",
-                //                 child: Text(
-                //                   "BSCoE",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value: "Bachelor of Elementary Education",
-                //                 child: Text(
-                //                   "BEEd",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Secondary Education major in Math",
-                //                 child: Text(
-                //                   "BSEd - Math",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Secondary Education major in English",
-                //                 child: Text(
-                //                   "BSEd - English",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Technology and Livelihood Education major in ICT",
-                //                 child: Text(
-                //                   "BTLED - ICT",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Technology and Livelihood Education major in HE",
-                //                 child: Text(
-                //                   "BTLED - HE",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Science in Automotive Technology",
-                //                 child: Text(
-                //                   "BSAT",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Science in Electronics Technology",
-                //                 child: Text(
-                //                   "BSET",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value:
-                //                     "Bachelor of Science in Entrepreneurship",
-                //                 child: Text(
-                //                   "BSEntrep",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value: "Bachelor of Science in Nursing",
-                //                 child: Text(
-                //                   "BSN",
-                //                   overflow: TextOverflow.ellipsis,
-                //                   maxLines: 1,
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12),
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //     // YEAR LEVEL SELECTOR
-                //     Row(
-                //       children: [
-                //         Text(
-                //           "Yr Level".toUpperCase(),
-                //           style: const TextStyle(
-                //             fontFamily: "Roboto",
-                //             fontSize: 14,
-                //             fontWeight: FontWeight.w500,
-                //           ),
-                //         ),
-                //         const SizedBox(
-                //           width: 10,
-                //         ),
-                //         // Dropdown
-                //         SizedBox(
-                //           width: 35,
-                //           child: DropdownButton<String>(
-                //             isExpanded: true,
-                //             value: selectedYear, // Current selected value
-                //             onChanged: (String? newValue) {
-                //               setState(() {
-                //                 selectedYear =
-                //                     newValue ?? ''; // Update the selected value
-                //               });
-                //             },
-                //             items: const [
-                //               DropdownMenuItem<String>(
-                //                 value: "1st Year",
-                //                 child: Text(
-                //                   "1",
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontSize: 14,
-                //                       fontWeight: FontWeight.w400),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value: "2nd Year",
-                //                 child: Text(
-                //                   "2",
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontSize: 14,
-                //                       fontWeight: FontWeight.w400),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value: "3rd Year",
-                //                 child: Text(
-                //                   "3",
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontSize: 14,
-                //                       fontWeight: FontWeight.w400),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value: "4th Year",
-                //                 child: Text(
-                //                   "4",
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontSize: 14,
-                //                       fontWeight: FontWeight.w400),
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //     // BLOCK SELECTOR
-                //     Row(
-                //       children: [
-                //         Text(
-                //           "Block:".toUpperCase(),
-                //           style: const TextStyle(
-                //             fontFamily: "Roboto",
-                //             fontSize: 14,
-                //             fontWeight: FontWeight.w500,
-                //           ),
-                //         ),
-                //         const SizedBox(
-                //           width: 10,
-                //         ),
-                //         // Dropdown
-                //         SizedBox(
-                //           width: 35,
-                //           child: DropdownButton<String>(
-                //             isExpanded: true,
-                //             value: selectedBlock, // Current selected value
-                //             onChanged: (String? newValue) {
-                //               setState(() {
-                //                 selectedBlock =
-                //                     newValue ?? ''; // Update the selected value
-                //               });
-                //             },
-                //             items: const [
-                //               DropdownMenuItem<String>(
-                //                 value: "A",
-                //                 child: Text(
-                //                   "A",
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontSize: 14,
-                //                       fontWeight: FontWeight.w400),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value: "B",
-                //                 child: Text(
-                //                   "B",
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontSize: 14,
-                //                       fontWeight: FontWeight.w400),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value: "C",
-                //                 child: Text(
-                //                   "C",
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontSize: 14,
-                //                       fontWeight: FontWeight.w400),
-                //                 ),
-                //               ),
-                //               DropdownMenuItem<String>(
-                //                 value: "D",
-                //                 child: Text(
-                //                   "D",
-                //                   style: TextStyle(
-                //                       fontFamily: "Roboto",
-                //                       fontSize: 14,
-                //                       fontWeight: FontWeight.w400),
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //   ],
-                // ),
+            child: Consumer(
+              builder: ((context, ref, child) {
+                final attendanceList = ref.watch(attendanceDataProvider);
+                final studentList = ref.watch(studentListProvider);
+                int dayValue = ref.watch(dayValueProvider);
+                int monthValue = ref.watch(monthValueProvider);
+                DateTime? datePickerSelected =
+                    ref.watch(datePickerSelectedProvider);
+                DateTime selectedDay = (datePickerSelected ?? DateTime.now())
+                    .add(Duration(days: dayValue));
+                DateTime selectedMonth = DateTime(selectedDay.year,
+                    selectedDay.month + monthValue, selectedDay.day);
+                // Format the current date into "MONTH DAY, YEAR" format
+                String formattedDate =
+                    DateFormat('MMMM dd, yyyy').format(selectedMonth);
 
-                // DATE SELECTOR
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                print(formattedDate);
+
+                // Filter the attendance data with the selected month
+                List<AttendanceRaw> filteredAttendance = attendanceList.when(
+                  data: (data) {
+                    return data.where((element) {
+                      print('data datetime:');
+                      print(element.datetime);
+                      print('selected month');
+                      print(selectedMonth);
+                      return element.datetime.day == selectedMonth.day &&
+                          element.datetime.year == selectedMonth.year &&
+                          element.datetime.month == selectedMonth.month;
+                    }).toList();
+                  },
+                  error: (error, stackTrace) => [],
+                  loading: () => [],
+                );
+
+                List<IndivStudent> absentStudents = studentList.when(
+                  data: (data) {
+                    return data.where((element) {
+                      return !filteredAttendance.any((attendance) =>
+                          attendance.fullName == element.fullName);
+                    }).toList();
+                  },
+                  error: (error, stackTrace) => [],
+                  loading: () => [],
+                );
+
+                // Merge filteredAttendance and absentStudents lists
+                List<dynamic> mergedList = List.from(filteredAttendance)
+                  ..addAll(absentStudents);
+
+                print("present students:");
+                print(filteredAttendance);
+                print("absent students:");
+                print(absentStudents);
+                return Column(
                   children: [
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          monthValue--;
-                        });
-                      },
-                      icon: const Icon(Icons.keyboard_double_arrow_left),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          dayValue--;
-                        });
-                      },
-                      icon: const Icon(Icons.chevron_left),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        final DateTime? dateTime = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(3000),
-                          builder: (context, child) {
-                            return Theme(
-                              data: Theme.of(context).copyWith(
-                                colorScheme: ColorScheme.light(
-                                  primary: Color(0xff16A637), // <-- SEE HERE
-                                  onPrimary: Color(0xff252525), // <-- SEE HERE
-                                  onSurface: Color(0xff252525), // <-- SEE HERE
-                                ),
-                                textButtonTheme: TextButtonThemeData(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor:
-                                        Color(0xff252525), // button text color
-                                  ),
-                                ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        // ! EXPORT BTN
+                        // StyledButton(
+                        //   btnText: "Export",
+                        //   onClick: () {},
+                        //   padding:
+                        //       EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        //   btnHeight: 40,
+                        //   textSize: 16,
+                        //   btnIcon: Icon(Icons.picture_as_pdf_outlined),
+                        //   iconOnRight: true,
+                        // ),
+                        IconButton(
+                          onPressed: () async {
+                            try {
+                              await AttendancePdf.generate(
+                                  mergedList, formattedDate); //! Pass the data
+                            } catch (e) {
+                              print("error generating pdf: $e");
+                            }
+                          },
+                          icon: Icon(
+                            Icons.picture_as_pdf_outlined,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        // ! FILTER BTN
+                        StyledButton(
+                          btnText: "Filters",
+                          onClick: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => FilterPage(),
                               ),
-                              child: child!,
                             );
                           },
-                        );
-                        if (dateTime != null) {
-                          setState(
-                            () {
-                              datePickerSelected = dateTime;
-                              dayValue = 0;
-                              monthValue = 0;
-                            },
-                          );
-                        }
-                      },
-                      child: Text(
-                        formattedDate,
-                        style: TextStyle(fontFamily: "Roboto", fontSize: 16),
-                      ),
+                          btnColor: Colors.white,
+                          btnIcon: Icon(Icons.tune),
+                          iconOnRight: true,
+                          noShadow: true,
+                          borderRadius: BorderRadius.circular(50),
+                          textSize: 16,
+                          textColor: Colors.black,
+                          isBorder: true,
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          btnHeight: 40,
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          dayValue++;
-                        });
-                      },
-                      icon: const Icon(Icons.chevron_right),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          monthValue++;
-                        });
-                      },
-                      icon: const Icon(Icons.keyboard_double_arrow_right),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(
-                  height: 10,
-                ),
-
-                // TABLE DISPLAY
-                // Display data here
-                StreamBuilder(
-                    stream: FirebaseDatabase.instance.ref().onValue,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData &&
-                          !snapshot.hasError &&
-                          snapshot.data!.snapshot.value != null) {
-                        // Data is available
-                        var data = snapshot.data!.snapshot.value;
-
-                        List<AttendanceData> attendanceData = [];
-                        List<String> uniqueFullNames = [];
-
-                        if (data is Map && data.isNotEmpty) {
-                          attendanceData = data.entries
-                              .where((e) {
-                                //! filter attendance data first
-                                List<String> tag_data =
-                                    e.value['tag_data'].toString().split(' - ');
-                                int timestamp = e.value['timestamp'];
-
-                                int indivStudentIndex = studentData.indexWhere(
-                                    (s) => s['full_name'] == tag_data[0]);
-
-                                if (indivStudentIndex == -1) {
-                                  return false;
-                                }
-
-                                // Filter based on selectedCourse, selectedYear,  selectedBlock, and selectedMonth
-                                bool courseFilter = selectedCourse == "All" ||
-                                    selectedCourse ==
-                                        studentData[indivStudentIndex]
-                                            ['course'];
-
-                                bool yearFilter = selectedYear == "All" ||
-                                    selectedYear ==
-                                        studentData[indivStudentIndex]
-                                            ['year_level'];
-
-                                bool blockFilter = selectedBlock == "All" ||
-                                    selectedBlock ==
-                                        studentData[indivStudentIndex]['block'];
-
-                                DateTime attendanceDateTime =
-                                    DateTime.fromMillisecondsSinceEpoch(
-                                        timestamp);
-
-                                bool dateFilter = selectedMonth.year ==
-                                        attendanceDateTime.year &&
-                                    selectedMonth.month ==
-                                        attendanceDateTime.month &&
-                                    selectedMonth.day == attendanceDateTime.day;
-
-                                return courseFilter &&
-                                    yearFilter &&
-                                    blockFilter &&
-                                    dateFilter;
-                              })
-                              .map((e) {
-                                //! get the data to be displayed
-                                List<String> tag_data =
-                                    e.value['tag_data'].toString().split(' - ');
-                                int timestamp = e.value['timestamp'];
-
-                                int indivStudentIndex = studentData.indexWhere(
-                                    (s) => s['full_name'] == tag_data[0]);
-
-                                print(indivStudentIndex);
-
-                                String fullName =
-                                    studentData[indivStudentIndex]['full_name'];
-
-                                if (!uniqueFullNames.contains(fullName)) {
-                                  //! filter out duplicates and get first occurence
-                                  uniqueFullNames.add(fullName);
-                                  return AttendanceData(
-                                      docId: tag_data[1],
-                                      fullName: fullName,
-                                      course: studentData[indivStudentIndex]
-                                          ['course'],
-                                      yrLevel: studentData[indivStudentIndex]
-                                          ['year_level'],
-                                      block: studentData[indivStudentIndex]
-                                          ['block'],
-                                      timestamp: timestamp);
-                                } else {
-                                  return null; // ? Duplicate, skip this entry
-                                }
-                              })
-                              .whereType<
-                                  AttendanceData>() //! remove the null values
-                              .toList();
-                        }
-
-                        return Column(
-                          children: [
-                            Table(
-                                columnWidths: const {
-                                  0: FlexColumnWidth(),
-                                  1: FixedColumnWidth(65.0),
-                                  2: FixedColumnWidth(100.0),
-                                },
-                                border: TableBorder
-                                    .all(), // Allows to add a border decoration around your table
-                                children: [
-                                  const TableRow(children: [
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 4),
-                                      child: Text(
-                                        'Name',
-                                        style: TextStyle(
-                                            fontFamily: "Roboto",
-                                            fontWeight: FontWeight.w500),
-                                        textAlign: TextAlign.center,
+                    // DATE SELECTOR
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            // setState(() {
+                            ref.read(monthValueProvider.notifier).state--;
+                            // monthValue--;
+                            // });
+                          },
+                          icon: const Icon(Icons.keyboard_double_arrow_left),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // setState(() {
+                            // dayValue--;
+                            ref.read(dayValueProvider.notifier).state--;
+                            // });
+                          },
+                          icon: const Icon(Icons.chevron_left),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            final DateTime? dateTime = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(3000),
+                              builder: (context, child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: ColorScheme.light(
+                                      primary:
+                                          Color(0xff16A637), // <-- SEE HERE
+                                      onPrimary:
+                                          Color(0xff252525), // <-- SEE HERE
+                                      onSurface:
+                                          Color(0xff252525), // <-- SEE HERE
+                                    ),
+                                    textButtonTheme: TextButtonThemeData(
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: Color(
+                                            0xff252525), // button text color
                                       ),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 4, vertical: 4),
-                                      child: Text(
-                                        'Status',
-                                        style: TextStyle(
-                                            fontFamily: "Roboto",
-                                            fontWeight: FontWeight.w500),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 4, vertical: 4),
-                                      child: Text(
-                                        'Time Arrived',
-                                        style: TextStyle(
-                                            fontFamily: "Roboto",
-                                            fontWeight: FontWeight.w500),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ]),
-                                  if (attendanceData
-                                      .isEmpty) //! Display the empty data
-                                    const TableRow(children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 16, vertical: 4),
-                                        child: Text(
-                                          "No data yet",
-                                          style: TextStyle(
-                                              fontFamily: "Roboto",
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 4, vertical: 4),
-                                        child: Text(
-                                          'Absent',
-                                          style: const TextStyle(
-                                              fontFamily: "Roboto",
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 4, vertical: 4),
-                                        child: Text(
-                                          "",
-                                          style: TextStyle(
-                                              fontFamily: "Roboto",
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ),
-                                    ]),
-                                  for (final data
-                                      in attendanceData) //! Display the filtered data
-                                    TableRow(children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16, vertical: 4),
-                                        child: Text(
-                                          data.fullName,
-                                          style: const TextStyle(
-                                              fontFamily: "Roboto",
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 4, vertical: 4),
-                                        child: Text(
-                                          'Absent',
-                                          style: const TextStyle(
-                                              fontFamily: "Roboto",
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 4, vertical: 4),
-                                        child: Text(
-                                          formatTime(DateTime
-                                              .fromMillisecondsSinceEpoch(
-                                                  data.timestamp)),
-                                          style: const TextStyle(
-                                              fontFamily: "Roboto",
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ),
-                                    ])
-                                ]),
+                                  ),
+                                  child: child!,
+                                );
+                              },
+                            );
+                            if (dateTime != null) {
+                              // setState(
+                              //   () {
+                              ref
+                                  .read(datePickerSelectedProvider.notifier)
+                                  .state = dateTime;
+                              // datePickerSelected = dateTime;
+                              ref.read(dayValueProvider.notifier).state = 0;
+                              // dayValue = 0;
+                              // monthValue = 0;
+                              ref.read(monthValueProvider.notifier).state = 0;
+                              //   },
+                              // );
+                            }
+                          },
+                          child: Text(
+                            formattedDate,
+                            style:
+                                TextStyle(fontFamily: "Roboto", fontSize: 16),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // setState(() {
+                            dayValue++;
+                            ref.read(dayValueProvider.notifier).state++;
+                            // });
+                          },
+                          icon: const Icon(Icons.chevron_right),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // setState(() {
+                            monthValue++;
+                            ref.read(monthValueProvider.notifier).state++;
+                            // });
+                          },
+                          icon: const Icon(Icons.keyboard_double_arrow_right),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
+                    ),
 
-                            //! EXPORT BUTTON
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            StyledButton(
-                                noShadow: true,
-                                btnIcon: Icon(Icons.picture_as_pdf),
-                                iconOnRight: true,
-                                btnText: "Export to Pdf",
-                                onClick: () async {
-                                  try {
-                                    await AttendancePdf.generate(attendanceData,
-                                        formattedDate); //! Pass the data
-                                  } catch (e) {
-                                    print("error generating pdf: $e");
-                                  }
-                                })
-                          ],
-                        );
-                      } else if (snapshot.hasError) {
-                        // Handle error
-                        return Center(
-                          child: Text('Error: ${snapshot.error}'),
-                        );
-                      } else if (snapshot.data?.snapshot.value == null) {
-                        return Table(
-                            border: TableBorder
-                                .all(), // Allows to add a border decoration around your table
-                            children: const [
-                              TableRow(children: [
+                    // const SizedBox(
+                    //   height: 10,
+                    // ),
+
+                    // TABLE DISPLAY
+
+                    Table(
+                        columnWidths: const {
+                          0: FixedColumnWidth(40),
+                          1: FlexColumnWidth(),
+                          2: FixedColumnWidth(65.0),
+                          3: FixedColumnWidth(100.0),
+                        },
+                        border: TableBorder
+                            .all(), // Allows to add a border decoration around your table
+                        children: [
+                          TableRow(
+                              decoration: BoxDecoration(
+                                color: Color(0xFFCDCDCD), // Set the color here
+                              ),
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 4),
+                                  child: Text(
+                                    '${mergedList.length}',
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w500),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 4),
@@ -786,78 +273,137 @@ class _AttendanceSectionState extends State<AttendanceSection> {
                                     style: TextStyle(
                                         fontFamily: "Roboto",
                                         fontWeight: FontWeight.w500),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 4),
+                                      horizontal: 4, vertical: 4),
+                                  child: Text(
+                                    'Status',
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w500),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 4, vertical: 4),
                                   child: Text(
                                     'Time Arrived',
                                     style: TextStyle(
                                         fontFamily: "Roboto",
                                         fontWeight: FontWeight.w500),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ]),
-                              TableRow(children: [
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 4),
-                                  child: Text(
-                                    'No Data Yet',
-                                    style: TextStyle(
-                                        fontFamily: "Roboto",
-                                        fontWeight: FontWeight.w500),
-                                  ),
+                          for (final item in mergedList)
+                            TableRow(children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 4),
+                                child: Text(
+                                  '${mergedList.indexOf(item) + 1}',
+                                  style: const TextStyle(
+                                      fontFamily: "Roboto",
+                                      fontWeight: FontWeight.w500),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 4),
-                                  child: Text(
-                                    'No Data Yet',
-                                    style: TextStyle(
-                                        fontFamily: "Roboto",
-                                        fontWeight: FontWeight.w500),
-                                  ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 4),
+                                child: Text(
+                                  item is AttendanceRaw
+                                      ? item.fullName
+                                      : (item as IndivStudent).fullName,
+                                  style: const TextStyle(
+                                      fontFamily: "Roboto",
+                                      fontWeight: FontWeight.w500),
                                 ),
-                              ]),
-                            ]);
-                      } else {
-                        // Data is still loading
-                        return Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                    }),
-              ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 4),
+                                child: Text(
+                                  item is AttendanceRaw
+                                      ? item.status
+                                      : 'Absent',
+                                  style: const TextStyle(
+                                      fontFamily: "Roboto",
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 4),
+                                child: Text(
+                                  item is AttendanceRaw
+                                      ? formatTime(item.datetime)
+                                      : '',
+                                  style: const TextStyle(
+                                      fontFamily: "Roboto",
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                            ]),
+                        ]),
+                  ],
+                );
+              }),
             ),
+
+            //         //! EXPORT BUTTON
+            //         const SizedBox(
+            //           height: 10,
+            //         ),
+            //         StyledButton(
+            //             noShadow: true,
+            //             btnIcon: Icon(Icons.picture_as_pdf),
+            //             iconOnRight: true,
+            //             btnText: "Export to Pdf",
+            //             onClick: () async {
+            //               // try {
+            //               //   await AttendancePdf.generate(attendanceData,
+            //               //       formattedDate); //! Pass the data
+            //               // } catch (e) {
+            //               //   print("error generating pdf: $e");
+            //               // }
+            //             }),
+            // const SizedBox(
+            //   height: 10,
+            // ),
+            // StyledButton(
+            //     noShadow: true,
+            //     btnIcon: Icon(Icons.picture_as_pdf),
+            //     iconOnRight: true,
+            //     btnText: "insert test data",
+            //     onClick: () async {
+            //       print('test insert');
+            //       final dbService = DatabaseService();
+            //       // final subjectId =
+            //       //     await dbService.insertSubject('OJT');
+            //       // final schedId = await dbService.insertSched(
+            //       //     subjectId, "Monday", "9AM", '12PM');
+            //       await dbService.insertStudent('129', 'Melv Sentids', 'Male',
+            //           'Bachelor of Science in Computer Science', "A", 1);
+
+            //       await dbService.assignSubject('129', 1).then((value) {
+            //         print('sheesh');
+            //       });
+
+            //       // await dbService
+            //       //     .insertAttendance('128', 1,
+            //       //         DateTime.now().microsecondsSinceEpoch, 'Present')
+            //       //     .then((value) {
+            //       //   print('success');
+            //       // });
+            //     })),
           ),
         ),
       ),
     );
-  }
-
-  Future fetchAllStudent() async {
-    try {
-      // Replace "your_collection" with the name of your Firestore collection
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('students').get();
-
-      // Loop through the documents in the collection
-      if (querySnapshot.docs.isNotEmpty) {
-        for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-          // Access the data of each document
-          Map<String, dynamic> data =
-              documentSnapshot.data() as Map<String, dynamic>;
-
-          setState(() {
-            studentData.add(data);
-          });
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
   }
 
   String formatTime(DateTime dateTime) {

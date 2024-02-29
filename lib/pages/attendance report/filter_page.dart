@@ -6,7 +6,7 @@ import 'package:nfc_app/widgets/styledButton.dart';
 class FilterPage extends ConsumerWidget {
   FilterPage({super.key});
 
-  List<String> courses = [
+  final List<String> courses = [
     'Bachelor of Science in Computer Science',
     'Bachelor of Science in Information System',
     'Bachelor of Science in Information Technology',
@@ -63,9 +63,6 @@ class FilterPage extends ConsumerWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
                 // Dropdown
                 SizedBox(
                   width: double.infinity,
@@ -104,9 +101,6 @@ class FilterPage extends ConsumerWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
                 ),
                 // Dropdown
                 SizedBox(
@@ -174,9 +168,6 @@ class FilterPage extends ConsumerWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
                 // Dropdown
                 SizedBox(
                   width: double.infinity,
@@ -243,9 +234,6 @@ class FilterPage extends ConsumerWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
                 // Dropdown
                 SizedBox(
                   width: double.infinity,
@@ -292,9 +280,6 @@ class FilterPage extends ConsumerWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
                 // Dropdown
                 SizedBox(
                   width: double.infinity,
@@ -340,9 +325,6 @@ class FilterPage extends ConsumerWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
                 ),
                 // Dropdown
                 SizedBox(

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nfc_app/database/database_service.dart';
 
 // applied values
 final filterProvider = StateProvider<Map<String, String>>((ref) {
@@ -21,3 +22,13 @@ final selectedSubjectProvider = StateProvider<String>((ref) => 'Capstone');
 final selectedSchedProvider =
     StateProvider<String>((ref) => 'Monday, 9AM - 12PM');
 final selectedGenderProvider = StateProvider<String>((ref) => 'All');
+
+// dynamic dropdown selection
+
+final courseSelectionProvider = FutureProvider<List<String>>((ref) async {
+  final dbService = DatabaseService();
+
+  List<String> tempList = [];
+
+  return tempList;
+});

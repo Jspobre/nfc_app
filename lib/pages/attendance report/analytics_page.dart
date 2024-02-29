@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:nfc_app/pages/attendance%20report/filter_page.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 
@@ -28,6 +29,10 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  IconButton(
+                    onPressed: () async {},
+                    icon: Icon(Icons.picture_as_pdf_outlined),
+                  ),
                   IconButton(
                     onPressed: () async {
                       final DateTimeRange? dateTimeRange =
@@ -71,7 +76,34 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                 ],
               ),
               const SizedBox(
-                height: 20,
+                height: 10,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  final DateTimeRange? dateTimeRange =
+                      await showDateRangePicker(
+                    context: context,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(3000),
+                  );
+
+                  if (dateTimeRange != null) {
+                    setState(() {
+                      selectedDates = dateTimeRange;
+                    });
+                  }
+                },
+                child: Center(
+                  child: Text(selectedDates.start.month ==
+                              selectedDates.end.month &&
+                          selectedDates.start.day == selectedDates.end.day &&
+                          selectedDates.start.year == selectedDates.end.year
+                      ? '${DateFormat('MMMM dd, yyyy').format(selectedDates.start)}'
+                      : '${DateFormat('MMMM dd, yyyy').format(selectedDates.start)} - ${DateFormat('MMMM dd, yyyy').format(selectedDates.end)}'),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
               ),
               Table(
                   columnWidths: const {
@@ -84,52 +116,56 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   border: TableBorder
                       .all(), // Allows to add a border decoration around your table
                   children: [
-                    const TableRow(children: [
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                        child: Text(
-                          'Name',
-                          style: TextStyle(
-                              fontFamily: "Roboto",
-                              fontWeight: FontWeight.w500),
-                          textAlign: TextAlign.center,
+                    const TableRow(
+                        decoration: BoxDecoration(
+                          color: Color(0xFFCDCDCD), // Set the color here
                         ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                        child: Text(
-                          'Presents',
-                          style: TextStyle(
-                              fontFamily: "Roboto",
-                              fontWeight: FontWeight.w500),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                        child: Text(
-                          'Absents',
-                          style: TextStyle(
-                              fontFamily: "Roboto",
-                              fontWeight: FontWeight.w500),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                        child: Text(
-                          'Lates',
-                          style: TextStyle(
-                              fontFamily: "Roboto",
-                              fontWeight: FontWeight.w500),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ]),
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 4),
+                            child: Text(
+                              'Name',
+                              style: TextStyle(
+                                  fontFamily: "Roboto",
+                                  fontWeight: FontWeight.w500),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 4),
+                            child: Text(
+                              'Presents',
+                              style: TextStyle(
+                                  fontFamily: "Roboto",
+                                  fontWeight: FontWeight.w500),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 4),
+                            child: Text(
+                              'Absents',
+                              style: TextStyle(
+                                  fontFamily: "Roboto",
+                                  fontWeight: FontWeight.w500),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 4),
+                            child: Text(
+                              'Lates',
+                              style: TextStyle(
+                                  fontFamily: "Roboto",
+                                  fontWeight: FontWeight.w500),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ]),
                     TableRow(children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -174,16 +210,16 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                     ])
                   ]),
 
-              //! EXPORT BUTTON
-              const SizedBox(
-                height: 10,
-              ),
-              StyledButton(
-                  noShadow: true,
-                  btnIcon: Icon(Icons.picture_as_pdf),
-                  iconOnRight: true,
-                  btnText: "Export to Pdf",
-                  onClick: () async {})
+              // //! EXPORT BUTTON
+              // const SizedBox(
+              //   height: 10,
+              // ),
+              // StyledButton(
+              //     noShadow: true,
+              //     btnIcon: Icon(Icons.picture_as_pdf),
+              //     iconOnRight: true,
+              //     btnText: "Export to Pdf",
+              //     onClick: () async {})
             ],
           ),
         ),

@@ -52,6 +52,4 @@ class NfcDB {
       FOREIGN KEY (schedule_id) REFERENCES $schedulesTable (schedule_id)
     );""");
   }
-
-  // INSERT FUNCTION HERE
 }
