@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:nfc_app/model/attendance_data.dart';
+import 'package:nfc_app/model/fetch_data.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
@@ -9,7 +10,7 @@ import 'package:printing/printing.dart';
 
 class AttendancePdf {
   static Future<void> generate(
-      List<AttendanceData> attendanceData, String formattedDate) async {
+      List<dynamic> attendanceData, String formattedDate) async {
     final pdf = Document();
 
     final buLogo = MemoryImage(
@@ -34,11 +35,13 @@ class AttendancePdf {
 
             // Add rows dynamically based on the attendanceData
             for (int i = 0; i < attendanceData.length; i++) {
-              final AttendanceData data = attendanceData[i];
+              final data = attendanceData[i];
               lastNumber = i + 1; // Update lastNumber
               tableData.add([
                 lastNumber.toString(),
-                data.fullName,
+                data is AttendanceRaw
+                    ? data.fullName
+                    : (data as IndivStudent).fullName,
                 lastNumber.toString()
               ]);
             }

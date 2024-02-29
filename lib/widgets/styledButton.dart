@@ -16,50 +16,105 @@ class StyledButton extends StatelessWidget {
   final bool? noShadow;
   final String? secondText;
   final dynamic borderRadius;
+  final bool? iconOnRight;
+  final double? textSize;
+  final bool? isBorder;
+  final EdgeInsetsGeometry? padding;
 
-  const StyledButton({
-    super.key,
-    required this.btnText,
-    required this.onClick,
-    this.btnIcon,
-    this.btnWidth,
-    this.btnHeight,
-    this.btnColor,
-    this.noShadow,
-    this.secondText,
-    this.borderRadius,
-    this.textColor,
-  });
+  const StyledButton(
+      {super.key,
+      required this.btnText,
+      required this.onClick,
+      this.btnIcon,
+      this.btnWidth,
+      this.btnHeight,
+      this.btnColor,
+      this.noShadow,
+      this.secondText,
+      this.borderRadius,
+      this.textColor,
+      this.iconOnRight,
+      this.textSize,
+      this.isBorder,
+      this.padding});
 
   @override
   Widget build(BuildContext context) {
     // BUTTON WITH ICON
-    if (btnIcon != null) {
+    if (btnIcon != null && iconOnRight == null && iconOnRight != true) {
       return SizedBox(
         height: btnHeight ?? 45,
         width: btnWidth,
         child: ElevatedButton.icon(
           onPressed: onClick,
           style: ElevatedButton.styleFrom(
+            padding: padding != null ? padding : null,
+
             // fixedSize: const Size(250, 32),
             elevation: noShadow == true ? 0 : 2,
             shape: RoundedRectangleBorder(
                 borderRadius: borderRadius ?? BorderRadius.circular(8)),
             backgroundColor: btnColor ?? const Color(0xff16A637),
             foregroundColor: textColor ?? Colors.white,
-            textStyle: const TextStyle(
+            textStyle: TextStyle(
                 letterSpacing: 1,
                 fontWeight: FontWeight.w400,
-                fontSize: 19,
+                fontSize: textSize ?? 19,
                 fontFamily: "Roboto"),
           ),
           icon: btnIcon,
           label: secondText != null
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [Text(btnText), Text(secondText!)],
+                  children: [
+                    Text(
+                      btnText,
+                    ),
+                    Text(
+                      secondText!,
+                    )
+                  ],
                 )
               : Text(btnText),
+        ),
+      );
+    } else if (btnIcon != null && iconOnRight != null && iconOnRight == true) {
+      return SizedBox(
+        height: btnHeight ?? 45,
+        width: btnWidth,
+        child: ElevatedButton(
+          onPressed: onClick,
+          style: ElevatedButton.styleFrom(
+              padding: padding != null ? padding : null,
+              // fixedSize: const Size(250, 32),
+              elevation: noShadow == true ? 0 : 2,
+              shape: RoundedRectangleBorder(
+                  borderRadius: borderRadius ?? BorderRadius.circular(8)),
+              backgroundColor: btnColor ?? Color(0xff16A637),
+              foregroundColor: textColor ?? Colors.white,
+              textStyle: TextStyle(
+                  letterSpacing: 1,
+                  fontWeight: FontWeight.w400,
+                  fontSize: textSize ?? 19,
+                  fontFamily: "Roboto"),
+              side: isBorder != null
+                  ? BorderSide(
+                      color: Color(0xff16A637),
+                    )
+                  : null),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                btnText,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(
+                width: 8,
+              ),
+              btnIcon
+            ],
+          ),
         ),
       );
     } else {
@@ -70,6 +125,13 @@ class StyledButton extends StatelessWidget {
         child: ElevatedButton(
           onPressed: onClick,
           style: ElevatedButton.styleFrom(
+            padding: padding != null ? padding : null,
+            side: isBorder != null
+                ? BorderSide(
+                    color: Color(0xff16A637),
+                  )
+                : null,
+
             // fixedSize: const Size(250, 32),
             elevation: noShadow == true ? 0 : 2,
 
@@ -77,10 +139,10 @@ class StyledButton extends StatelessWidget {
                 borderRadius: borderRadius ?? BorderRadius.circular(8)),
             backgroundColor: btnColor ?? Color(0xff16A637),
             foregroundColor: textColor ?? Colors.white,
-            textStyle: const TextStyle(
+            textStyle: TextStyle(
                 letterSpacing: 1,
                 fontWeight: FontWeight.w400,
-                fontSize: 19,
+                fontSize: textSize ?? 19,
                 fontFamily: "Roboto"),
           ),
           child: Text(
