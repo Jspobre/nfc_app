@@ -5,7 +5,7 @@ import 'package:nfc_app/model/fetch_data.dart';
 final attendanceDataProvider = FutureProvider<List<AttendanceRaw>>((ref) async {
   final dbService = DatabaseService();
 
-  final attendanceRawData = await dbService.fetchAttendanceData(1);
+  final attendanceRawData = await dbService.fetchAttendanceData();
 
   List<AttendanceRaw> tempList = attendanceRawData
       .map((e) => AttendanceRaw(
@@ -18,6 +18,7 @@ final attendanceDataProvider = FutureProvider<List<AttendanceRaw>>((ref) async {
           gender: e['gender'] as String,
           course: e['course'] as String,
           block: e['block'] as String,
+          yearLevel: e['year_level'] as int,
           subjectId: e['subject_id'] as int,
           day: e['day'] as String,
           startTime: e['start_time'] as String,
@@ -30,8 +31,7 @@ final attendanceDataProvider = FutureProvider<List<AttendanceRaw>>((ref) async {
 final studentListProvider = FutureProvider<List<IndivStudent>>((ref) async {
   final dbService = DatabaseService();
 
-  final studentList = await dbService.fetchStudentsList(
-      1, 1, 'A', 'Bachelor of Science in Computer Science', 'Male');
+  final studentList = await dbService.fetchStudentsList();
 
   List<IndivStudent> tempList = studentList
       .map((e) => IndivStudent(
@@ -40,6 +40,7 @@ final studentListProvider = FutureProvider<List<IndivStudent>>((ref) async {
           gender: e['gender'] as String,
           course: e['course'] as String,
           block: e['block'] as String,
+          yearLevel: e['year_level'] as int,
           subjectId: e['subject_id'] as int))
       .toList();
 

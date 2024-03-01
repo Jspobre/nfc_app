@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:nfc_app/api/attendance_pdf.dart';
 import 'package:nfc_app/database/database_service.dart';
-import 'package:nfc_app/model/attendance_data.dart';
 import 'package:nfc_app/model/fetch_data.dart';
 import 'package:nfc_app/pages/attendance%20report/filter_page.dart';
 import 'package:nfc_app/provider/attendanceData_provider.dart';
 import 'package:nfc_app/provider/date_provider.dart';
+import 'package:nfc_app/provider/filterPage_provider.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 
 class AttendanceSection extends ConsumerWidget {
@@ -15,6 +15,7 @@ class AttendanceSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedFilters = ref.watch(filterProvider);
     return SafeArea(
       child: SingleChildScrollView(
         child: SizedBox(
@@ -43,6 +44,15 @@ class AttendanceSection extends ConsumerWidget {
                 List<AttendanceRaw> filteredAttendance = attendanceList.when(
                   data: (data) {
                     return data.where((element) {
+                      print(element.fullName);
+                      return selectedFilters['course'] == element.course &&
+                          selectedFilters['block'] == element.block &&
+                          selectedFilters['yearLevel'] == element.yearLevel &&
+                          selectedFilters['subject'] == element.subjectId &&
+                          selectedFilters['sched'] == element.scheduleId &&
+                          (selectedFilters['gender'] == element.gender ||
+                              selectedFilters['gender'] == 'All');
+                    }).where((element) {
                       print('data datetime:');
                       print(element.datetime);
                       print('selected month');
@@ -59,6 +69,13 @@ class AttendanceSection extends ConsumerWidget {
                 List<IndivStudent> absentStudents = studentList.when(
                   data: (data) {
                     return data.where((element) {
+                      return selectedFilters['course'] == element.course &&
+                          selectedFilters['block'] == element.block &&
+                          selectedFilters['yearLevel'] == element.yearLevel &&
+                          selectedFilters['subject'] == element.subjectId &&
+                          (selectedFilters['gender'] == element.gender ||
+                              selectedFilters['gender'] == 'All');
+                    }).where((element) {
                       return !filteredAttendance.any((attendance) =>
                           attendance.fullName == element.fullName);
                     }).toList();
@@ -299,6 +316,53 @@ class AttendanceSection extends ConsumerWidget {
                                   ),
                                 ),
                               ]),
+                          if ((selectedFilters['course'] as String).isEmpty &&
+                              (selectedFilters['subject'] as int) == 0 &&
+                              (selectedFilters['sched'] as int) == 0)
+                            TableRow(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 4),
+                                  child: Text(
+                                    '0',
+                                    style: const TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 4),
+                                  child: Text(
+                                    'Select Filter First',
+                                    style: const TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 4, vertical: 4),
+                                  child: Text(
+                                    '',
+                                    style: const TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 4, vertical: 4),
+                                  child: Text(
+                                    '',
+                                    style: const TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              ],
+                            ),
                           for (final item in mergedList)
                             TableRow(children: [
                               Padding(
@@ -349,57 +413,54 @@ class AttendanceSection extends ConsumerWidget {
                               ),
                             ]),
                         ]),
+                    StyledButton(
+                        noShadow: true,
+                        btnIcon: Icon(Icons.picture_as_pdf),
+                        iconOnRight: true,
+                        btnText: "insert test data",
+                        onClick: () async {
+                          print('test insert');
+                          final dbService = DatabaseService();
+
+                          final subjectId = await dbService.insertSubject(
+                              'test sub',
+                              "Bachelor of Science in Information Technology");
+                          final schedId = await dbService.insertSched(
+                              subjectId, "Wed", "9AM", '12PM');
+                          await dbService.insertStudent(
+                              '17',
+                              'COFFEE BREAK',
+                              'Male',
+                              'Bachelor of Science in Information Technology',
+                              "A",
+                              1);
+
+                          await dbService
+                              .assignSubject('17', subjectId)
+                              .then((value) {
+                            print('sheesh');
+                          });
+
+                          print(subjectId);
+                          print(schedId);
+                          await dbService
+                              .insertAttendance(
+                                  '17',
+                                  schedId,
+                                  DateTime.now().microsecondsSinceEpoch,
+                                  'Present')
+                              .then((value) {
+                            print('success');
+                          });
+                          // ignore: unused_result
+                          ref.refresh(studentListProvider);
+                          // ignore: unused_result
+                          ref.refresh(attendanceDataProvider);
+                        }),
                   ],
                 );
               }),
             ),
-
-            //         //! EXPORT BUTTON
-            //         const SizedBox(
-            //           height: 10,
-            //         ),
-            //         StyledButton(
-            //             noShadow: true,
-            //             btnIcon: Icon(Icons.picture_as_pdf),
-            //             iconOnRight: true,
-            //             btnText: "Export to Pdf",
-            //             onClick: () async {
-            //               // try {
-            //               //   await AttendancePdf.generate(attendanceData,
-            //               //       formattedDate); //! Pass the data
-            //               // } catch (e) {
-            //               //   print("error generating pdf: $e");
-            //               // }
-            //             }),
-            // const SizedBox(
-            //   height: 10,
-            // ),
-            // StyledButton(
-            //     noShadow: true,
-            //     btnIcon: Icon(Icons.picture_as_pdf),
-            //     iconOnRight: true,
-            //     btnText: "insert test data",
-            //     onClick: () async {
-            //       print('test insert');
-            //       final dbService = DatabaseService();
-            //       // final subjectId =
-            //       //     await dbService.insertSubject('OJT');
-            //       // final schedId = await dbService.insertSched(
-            //       //     subjectId, "Monday", "9AM", '12PM');
-            //       await dbService.insertStudent('129', 'Melv Sentids', 'Male',
-            //           'Bachelor of Science in Computer Science', "A", 1);
-
-            //       await dbService.assignSubject('129', 1).then((value) {
-            //         print('sheesh');
-            //       });
-
-            //       // await dbService
-            //       //     .insertAttendance('128', 1,
-            //       //         DateTime.now().microsecondsSinceEpoch, 'Present')
-            //       //     .then((value) {
-            //       //   print('success');
-            //       // });
-            //     })),
           ),
         ),
       ),

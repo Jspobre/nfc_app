@@ -26,7 +26,8 @@ class _AddSubjectState extends State<AddSubject> {
     // Perform validation if needed
 
     // Insert the subject into the database
-    await DatabaseService().insertSubject(subjectName);
+    await DatabaseService()
+        .insertSubject(subjectName, 'Bachelor of Science in Computer Science');
 
     // Show a toast or message to indicate successful submission
     Fluttertoast.showToast(

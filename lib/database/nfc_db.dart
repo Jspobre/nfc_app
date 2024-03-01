@@ -1,5 +1,4 @@
 import 'package:sqflite/sqflite.dart';
-import '../database/database_service.dart';
 
 class NfcDB {
   // FOR CREATING TABLE DURING INITIALIZATION

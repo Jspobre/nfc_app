@@ -1,36 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nfc_app/provider/attendanceData_provider.dart';
 import 'package:nfc_app/provider/filterPage_provider.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 
 class FilterPage extends ConsumerWidget {
   FilterPage({super.key});
 
-  final List<String> courses = [
-    'Bachelor of Science in Computer Science',
-    'Bachelor of Science in Information System',
-    'Bachelor of Science in Information Technology',
-    'Bachelor of Science in Information Technology major in Animation',
-    'Bachelor of Science in Electronics Engineering',
-    'Bachelor of Science in Computer Engineering',
-    'Bachelor of Elementary Education',
-    'Bachelor of Secondary Education major in Math',
-    'Bachelor of Secondary Education major in English',
-    'Bachelor of Technology and Livelihood Education major in ICT',
-    'Bachelor of Technology and Livelihood Education major in HE',
-    'Bachelor of Science in Automotive Technology',
-    'Bachelor of Science in Electronics Technology',
-    'Bachelor of Science in Entrepreneurship',
-    'Bachelor of Science in Nursing',
-  ];
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     String selectedCourse = ref.watch(selectedCourseProvider);
-    String selectedYear = ref.watch(selectedYearProvider);
+    int selectedYear = ref.watch(selectedYearProvider);
     String selectedBlock = ref.watch(selectedBlockProvider);
-    String selectedSubject = ref.watch(selectedSubjectProvider);
-    String selectedSched = ref.watch(selectedSchedProvider);
+    int selectedSubject = ref.watch(selectedSubjectProvider);
+    int selectedSched = ref.watch(selectedSchedProvider);
     String selectedGender = ref.watch(selectedGenderProvider);
+
+    final courseOptionsFuture = ref.watch(courseSelectionProvider);
+    print("course options:");
+    print(courseOptionsFuture);
+
+    final List<String> courseOptions = courseOptionsFuture.when(
+      data: (data) {
+        print(data);
+        return data;
+      },
+      error: (error, stackTrace) => [],
+      loading: () => [],
+    );
+
+    final subjectOptionsFuture = ref.watch(subjectOptionsProvider);
+
+    final List<Map<String, dynamic>> subjectOptions = subjectOptionsFuture.when(
+      data: (data) {
+        return data;
+      },
+      loading: () => [], // Return empty list while loading
+      error: (error, stackTrace) => [], // Return empty list in case of error
+    );
+
+    final schedOptionsFuture = ref.watch(schedOptionsProvider);
+
+    final List<Map<String, dynamic>> schedOptions = schedOptionsFuture.when(
+      data: (data) {
+        return data;
+      },
+      loading: () => [], // Return empty list while loading
+      error: (error, stackTrace) => [], // Return empty list in case of error
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -38,6 +55,9 @@ class FilterPage extends ConsumerWidget {
           icon: Icon(Icons.close), // Close icon
           onPressed: () {
             Navigator.pop(context);
+            ref.read(selectedCourseProvider.notifier).state = '';
+            ref.read(selectedSubjectProvider.notifier).state = 0;
+            ref.read(selectedSchedProvider.notifier).state = 0;
           },
         ),
         title: Text(
@@ -72,9 +92,24 @@ class FilterPage extends ConsumerWidget {
                     onChanged: (String? newValue) {
                       ref.read(selectedCourseProvider.notifier).state =
                           newValue ?? '';
+                      ref.read(selectedSubjectProvider.notifier).state = 0;
+                      ref.read(selectedSchedProvider.notifier).state = 0;
                     },
                     items: [
-                      for (final course in courses)
+                      DropdownMenuItem<String>(
+                        enabled: false,
+                        value: '',
+                        child: Text(
+                          'Select Course',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                              fontFamily: "Roboto",
+                              fontWeight: FontWeight.w400,
+                              fontSize: 14),
+                        ),
+                      ),
+                      for (final course in courseOptions)
                         DropdownMenuItem<String>(
                           value: course,
                           child: Text(
@@ -105,48 +140,48 @@ class FilterPage extends ConsumerWidget {
                 // Dropdown
                 SizedBox(
                   width: double.infinity,
-                  child: DropdownButton<String>(
+                  child: DropdownButton<int>(
                     isExpanded: true,
                     value: selectedYear, // Current selected value
-                    onChanged: (String? newValue) {
+                    onChanged: (int? newValue) {
                       ref.read(selectedYearProvider.notifier).state =
-                          newValue ?? '';
+                          newValue ?? 1;
                     },
                     items: const [
-                      DropdownMenuItem<String>(
-                        value: "1st Year",
+                      DropdownMenuItem<int>(
+                        value: 1,
                         child: Text(
-                          "1",
+                          "1st Year",
                           style: TextStyle(
                               fontFamily: "Roboto",
                               fontSize: 14,
                               fontWeight: FontWeight.w400),
                         ),
                       ),
-                      DropdownMenuItem<String>(
-                        value: "2nd Year",
+                      DropdownMenuItem<int>(
+                        value: 2,
                         child: Text(
-                          "2",
+                          "2nd Year",
                           style: TextStyle(
                               fontFamily: "Roboto",
                               fontSize: 14,
                               fontWeight: FontWeight.w400),
                         ),
                       ),
-                      DropdownMenuItem<String>(
-                        value: "3rd Year",
+                      DropdownMenuItem<int>(
+                        value: 3,
                         child: Text(
-                          "3",
+                          "3rd Year",
                           style: TextStyle(
                               fontFamily: "Roboto",
                               fontSize: 14,
                               fontWeight: FontWeight.w400),
                         ),
                       ),
-                      DropdownMenuItem<String>(
-                        value: "4th Year",
+                      DropdownMenuItem<int>(
+                        value: 4,
                         child: Text(
-                          "4",
+                          "4th Year",
                           style: TextStyle(
                               fontFamily: "Roboto",
                               fontSize: 14,
@@ -176,7 +211,7 @@ class FilterPage extends ConsumerWidget {
                     value: selectedBlock, // Current selected value
                     onChanged: (String? newValue) {
                       ref.read(selectedBlockProvider.notifier).state =
-                          newValue ?? '';
+                          newValue ?? 'A';
                     },
                     items: const [
                       DropdownMenuItem<String>(
@@ -237,35 +272,53 @@ class FilterPage extends ConsumerWidget {
                 // Dropdown
                 SizedBox(
                   width: double.infinity,
-                  child: DropdownButton<String>(
+                  child: DropdownButton<int>(
                     isExpanded: true,
                     value: selectedSubject, // Current selected value
-                    onChanged: (String? newValue) {
+                    onChanged: (int? newValue) {
                       ref.read(selectedSubjectProvider.notifier).state =
-                          newValue ?? '';
+                          newValue ?? 0;
+                      ref.read(selectedSchedProvider.notifier).state = 0;
                     },
-                    items: const [
-                      DropdownMenuItem<String>(
-                        value: "Capstone",
+                    items: [
+                      DropdownMenuItem<int>(
+                        enabled: false,
+                        value: 0,
                         child: Text(
-                          "Capstone",
-                          style: TextStyle(
-                              fontFamily: "Roboto",
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400),
+                          'Select subject',
+                          style: const TextStyle(
+                            fontFamily: "Roboto",
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
-                      DropdownMenuItem<String>(
-                        value: "Sheesh",
-                        child: Text(
-                          "Sheesh",
-                          style: TextStyle(
+                      for (final option in subjectOptions)
+                        DropdownMenuItem<int>(
+                          value: option['subject_id'] as int,
+                          child: Text(
+                            option['subject_name'] as String,
+                            style: const TextStyle(
                               fontFamily: "Roboto",
                               fontSize: 14,
-                              fontWeight: FontWeight.w400),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
                         ),
-                      ),
                     ],
+                    // items: subjectOptions.map((subject) {
+                    //   return DropdownMenuItem<int>(
+                    //     value: subject['subject_id'] as int,
+                    //     child: Text(
+                    //       subject['subject_name'] as String,
+                    //       style: const TextStyle(
+                    //         fontFamily: "Roboto",
+                    //         fontSize: 14,
+                    //         fontWeight: FontWeight.w400,
+                    //       ),
+                    //     ),
+                    //   );
+                    // }).toList(),
                   ),
                 ),
                 const SizedBox(
@@ -283,34 +336,36 @@ class FilterPage extends ConsumerWidget {
                 // Dropdown
                 SizedBox(
                   width: double.infinity,
-                  child: DropdownButton<String>(
+                  child: DropdownButton<int>(
                     isExpanded: true,
                     value: selectedSched, // Current selected value
-                    onChanged: (String? newValue) {
+                    onChanged: (int? newValue) {
                       ref.read(selectedSchedProvider.notifier).state =
-                          newValue ?? '';
+                          newValue ?? 1;
                     },
-                    items: const [
-                      DropdownMenuItem<String>(
-                        value: "Monday, 9AM - 12PM",
+                    items: [
+                      DropdownMenuItem<int>(
+                        enabled: false,
+                        value: 0,
                         child: Text(
-                          "Monday, 9AM - 12PM",
+                          "Select Sched",
                           style: TextStyle(
                               fontFamily: "Roboto",
                               fontSize: 14,
                               fontWeight: FontWeight.w400),
                         ),
                       ),
-                      DropdownMenuItem<String>(
-                        value: "Monday, 1PM - 3PM",
-                        child: Text(
-                          "Monday, 1PM - 3PM",
-                          style: TextStyle(
-                              fontFamily: "Roboto",
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400),
+                      for (final options in schedOptions)
+                        DropdownMenuItem<int>(
+                          value: options['schedule_id'],
+                          child: Text(
+                            '${options['day']}, ${options['start_time']} - ${options['end_time']}',
+                            style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -401,8 +456,6 @@ class FilterPage extends ConsumerWidget {
                   noShadow: true,
                   btnText: "Apply",
                   onClick: () {
-                    print("before");
-                    print(ref.watch(filterProvider));
                     ref.read(filterProvider.notifier).state = {
                       'course': selectedCourse,
                       'yearLevel': selectedYear,
@@ -411,8 +464,15 @@ class FilterPage extends ConsumerWidget {
                       'sched': selectedSched,
                       'gender': selectedGender,
                     };
-                    print("after");
-                    print(ref.watch(filterProvider));
+                    ref.read(selectedCourseProvider.notifier).state = '';
+                    ref.read(selectedSubjectProvider.notifier).state = 0;
+                    ref.read(selectedSchedProvider.notifier).state = 0;
+
+                    // ignore: unused_result
+                    ref.refresh(attendanceDataProvider);
+                    // ignore: unused_result
+                    ref.refresh(studentListProvider);
+                    Navigator.pop(context);
                   },
                 ),
               ),
