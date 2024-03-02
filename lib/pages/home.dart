@@ -11,6 +11,7 @@ import 'package:ndef/utilities.dart';
 import 'package:nfc_app/pages/add%20schedule/add_schedule.dart';
 import 'package:nfc_app/pages/add%20student/add_student.dart';
 import 'package:nfc_app/pages/attendance%20report/attendance_report.dart';
+import 'package:nfc_app/pages/enroll%20student/enroll_student.dart';
 import 'package:nfc_app/widgets/bottom%20sheet%20modal/floating_modal.dart';
 import 'package:nfc_app/widgets/bottom%20sheet%20modal/modal_inside_modal.dart';
 import 'package:nfc_app/widgets/bottom%20sheet%20modal/scan_modal.dart';
@@ -316,6 +317,15 @@ class _HomeState extends State<Home> {
               );
               items.add(
                 const PopupMenuItem<String>(
+                  value: 'enrollstudent',
+                  child: Text(
+                    'Enroll student',
+                    style: TextStyle(fontFamily: "Roboto"),
+                  ),
+                ),
+              );
+              items.add(
+                const PopupMenuItem<String>(
                   value: 'attendance',
                   child: Text(
                     'View attendance',
@@ -355,6 +365,13 @@ class _HomeState extends State<Home> {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (BuildContext context) {
                       return AddStudent();
+                    }),
+                  );
+                  break;
+                case 'enrollstudent':
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return EnrollStudent();
                     }),
                   );
                   break;

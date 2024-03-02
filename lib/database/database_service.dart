@@ -30,17 +30,42 @@ class DatabaseService {
     return database;
   }
 
+  //function to delete a specific row in the subjects table using id
+  Future<void> deleteSubject(int id) async {
+    // Get a reference to the database
+    Database db = await database;
+
+    // Delete the subject with the specified id
+    await db.delete(
+      'subjects',
+      where: 'subject_id = ?',
+      whereArgs: [id],
+    );
+  }
+
   Future<void> create(Database database, int version) async =>
       await NfcDB().createTable(database);
 
-  Future<int> insertSubject(String subjectName) async {
+  // Function to fetch subject names and course names
+  Future<List<Map<String, dynamic>>> fetchSubjectsWithCourses() async {
+    final Database db = await database;
+    return await db.query('subjects');
+  }
+
+  Future<List<Map<String, dynamic>>> fetchStudentLists() async {
+    final Database db = await database;
+    return await db.query('students');
+  }
+
+  // Insert subject and course name
+  Future<int> insertSubject(String subjectName, String? courseName) async {
     // Get a reference to the database
     final db = await database;
 
     // Insert the subject into the subjects table
     return await db.insert(
       'subjects',
-      {'subject_name': subjectName},
+      {'subject_name': subjectName, 'course_name': courseName},
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
@@ -64,9 +89,15 @@ class DatabaseService {
     );
   }
 
+// Function to fetch all of the schedules
+  Future<List<Map<String, dynamic>>> fetchAllSchedules() async {
+    final db = await database;
+    return await db.query('schedules');
+  }
+
 // Insert student
   Future<void> insertStudent(String studentNum, String fullName, String gender,
-      String course, String block, int yearLevel) async {
+      String course, String block, String yearLevel) async {
     // Get a reference to the database
     final db = await database;
 
