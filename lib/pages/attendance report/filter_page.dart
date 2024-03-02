@@ -9,13 +9,15 @@ class FilterPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // states for each dropdown
     String selectedCourse = ref.watch(selectedCourseProvider);
-    int selectedYear = ref.watch(selectedYearProvider);
+    String selectedYear = ref.watch(selectedYearProvider);
     String selectedBlock = ref.watch(selectedBlockProvider);
     int selectedSubject = ref.watch(selectedSubjectProvider);
     int selectedSched = ref.watch(selectedSchedProvider);
     String selectedGender = ref.watch(selectedGenderProvider);
 
+    // fetch dynamic course
     final courseOptionsFuture = ref.watch(courseSelectionProvider);
     print("course options:");
     print(courseOptionsFuture);
@@ -29,6 +31,7 @@ class FilterPage extends ConsumerWidget {
       loading: () => [],
     );
 
+// fetch dynamic subject based on selected course
     final subjectOptionsFuture = ref.watch(subjectOptionsProvider);
 
     final List<Map<String, dynamic>> subjectOptions = subjectOptionsFuture.when(
@@ -39,6 +42,7 @@ class FilterPage extends ConsumerWidget {
       error: (error, stackTrace) => [], // Return empty list in case of error
     );
 
+// fetch dynamic sched based on selected subject
     final schedOptionsFuture = ref.watch(schedOptionsProvider);
 
     final List<Map<String, dynamic>> schedOptions = schedOptionsFuture.when(
@@ -140,16 +144,16 @@ class FilterPage extends ConsumerWidget {
                 // Dropdown
                 SizedBox(
                   width: double.infinity,
-                  child: DropdownButton<int>(
+                  child: DropdownButton<String>(
                     isExpanded: true,
                     value: selectedYear, // Current selected value
-                    onChanged: (int? newValue) {
+                    onChanged: (String? newValue) {
                       ref.read(selectedYearProvider.notifier).state =
-                          newValue ?? 1;
+                          newValue ?? "1st Year";
                     },
                     items: const [
-                      DropdownMenuItem<int>(
-                        value: 1,
+                      DropdownMenuItem<String>(
+                        value: "1st Year",
                         child: Text(
                           "1st Year",
                           style: TextStyle(
@@ -158,8 +162,8 @@ class FilterPage extends ConsumerWidget {
                               fontWeight: FontWeight.w400),
                         ),
                       ),
-                      DropdownMenuItem<int>(
-                        value: 2,
+                      DropdownMenuItem<String>(
+                        value: "2nd Year",
                         child: Text(
                           "2nd Year",
                           style: TextStyle(
@@ -168,8 +172,8 @@ class FilterPage extends ConsumerWidget {
                               fontWeight: FontWeight.w400),
                         ),
                       ),
-                      DropdownMenuItem<int>(
-                        value: 3,
+                      DropdownMenuItem<String>(
+                        value: "3rd Year",
                         child: Text(
                           "3rd Year",
                           style: TextStyle(
@@ -178,8 +182,8 @@ class FilterPage extends ConsumerWidget {
                               fontWeight: FontWeight.w400),
                         ),
                       ),
-                      DropdownMenuItem<int>(
-                        value: 4,
+                      DropdownMenuItem<String>(
+                        value: "4th Year",
                         child: Text(
                           "4th Year",
                           style: TextStyle(
@@ -456,6 +460,7 @@ class FilterPage extends ConsumerWidget {
                   noShadow: true,
                   btnText: "Apply",
                   onClick: () {
+                    // set the state for the selected filters
                     ref.read(filterProvider.notifier).state = {
                       'course': selectedCourse,
                       'yearLevel': selectedYear,
@@ -464,6 +469,8 @@ class FilterPage extends ConsumerWidget {
                       'sched': selectedSched,
                       'gender': selectedGender,
                     };
+
+                    // reset dynamic dropdowns to prevent error
                     ref.read(selectedCourseProvider.notifier).state = '';
                     ref.read(selectedSubjectProvider.notifier).state = 0;
                     ref.read(selectedSchedProvider.notifier).state = 0;
@@ -472,6 +479,8 @@ class FilterPage extends ConsumerWidget {
                     ref.refresh(attendanceDataProvider);
                     // ignore: unused_result
                     ref.refresh(studentListProvider);
+
+                    // close page after applying
                     Navigator.pop(context);
                   },
                 ),

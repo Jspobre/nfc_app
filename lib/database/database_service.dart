@@ -176,4 +176,42 @@ class DatabaseService {
       WHERE subject_id = ?
   ''', [subjectId]);
   }
+
+  // Fetch subjectName
+  Future<String> fetchSubjectName(int subjectId) async {
+    final Database db = await database;
+    List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT subject_name
+    FROM subjects
+    WHERE subject_id = ?
+  ''', [subjectId]);
+
+    // Check if any result is returned
+    if (result.isNotEmpty) {
+      // Extract and return the subject name
+      return result.first['subject_name'];
+    } else {
+      // Return null if no result found
+      return '';
+    }
+  }
+
+  // Fetch sched Details
+  Future<String> fetchSchedDetails(int schedId) async {
+    final Database db = await database;
+    List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT day,start_time, end_time
+    FROM schedules
+    WHERE schedule_id = ?
+  ''', [schedId]);
+
+    // Check if any result is returned
+    if (result.isNotEmpty) {
+      // Extract and return the subject name
+      return '${result.first['day']}, ${result.first['start_time']} - ${result.first['end_time']}';
+    } else {
+      // Return null if no result found
+      return '';
+    }
+  }
 }

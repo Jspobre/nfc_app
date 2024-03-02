@@ -11,14 +11,14 @@ final attendanceDataProvider = FutureProvider<List<AttendanceRaw>>((ref) async {
       .map((e) => AttendanceRaw(
           studentNum: e['student_num'] as String,
           scheduleId: e['schedule_id'] as int,
-          // datetime: DateTime.fromMillisecondsSinceEpoch(e['datetime'] as int),
-          datetime: DateTime.now(),
+          datetime: DateTime.fromMicrosecondsSinceEpoch(e['datetime'] as int),
+          // datetime: DateTime.now(),
           status: e['status'] as String,
           fullName: e['full_name'],
           gender: e['gender'] as String,
           course: e['course'] as String,
           block: e['block'] as String,
-          yearLevel: e['year_level'] as int,
+          yearLevel: e['year_level'] as String,
           subjectId: e['subject_id'] as int,
           day: e['day'] as String,
           startTime: e['start_time'] as String,
@@ -40,7 +40,7 @@ final studentListProvider = FutureProvider<List<IndivStudent>>((ref) async {
           gender: e['gender'] as String,
           course: e['course'] as String,
           block: e['block'] as String,
-          yearLevel: e['year_level'] as int,
+          yearLevel: e['year_level'] as String,
           subjectId: e['subject_id'] as int))
       .toList();
 

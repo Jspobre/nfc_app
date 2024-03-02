@@ -5,7 +5,7 @@ import 'package:nfc_app/database/database_service.dart';
 final filterProvider = StateProvider<Map<String, dynamic>>((ref) {
   return {
     'course': '',
-    'yearLevel': 1,
+    'yearLevel': '1st Year',
     'block': 'A',
     'subject': 0,
     'sched': 0,
@@ -15,7 +15,7 @@ final filterProvider = StateProvider<Map<String, dynamic>>((ref) {
 
 // for dropdown
 final selectedCourseProvider = StateProvider<String>((ref) => '');
-final selectedYearProvider = StateProvider<int>((ref) => 1);
+final selectedYearProvider = StateProvider<String>((ref) => "1st Year");
 final selectedBlockProvider = StateProvider<String>((ref) => 'A');
 final selectedSubjectProvider = StateProvider<int>((ref) => 0);
 final selectedSchedProvider = StateProvider<int>((ref) => 0);

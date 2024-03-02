@@ -7,7 +7,7 @@ class AttendanceRaw {
   final String gender;
   final String course;
   final String block;
-  final int yearLevel;
+  final String yearLevel;
   final int subjectId;
   final String day;
   final String startTime;
@@ -35,7 +35,7 @@ class IndivStudent {
   final String gender;
   final String course;
   final String block;
-  final int yearLevel;
+  final String yearLevel;
   final int subjectId;
 
   IndivStudent({
