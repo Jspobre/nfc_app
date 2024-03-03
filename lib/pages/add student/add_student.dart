@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:nfc_app/database/database_service.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 import 'package:nfc_app/widgets/styledTextFormField.dart';
 import 'package:nfc_app/widgets/textfield%20container/textfieldContainer.dart';
@@ -17,7 +18,7 @@ class _AddStudentState extends State<AddStudent> {
 
   final studentNameController = TextEditingController();
 
-  String? isIrregular;
+  String? selectedGender;
   String? selectedCourse;
   String? selectedYearLevel;
   String? selectedBlock;
@@ -31,6 +32,53 @@ class _AddStudentState extends State<AddStudent> {
 
   final _registrationFormKey = GlobalKey<FormState>();
   // used for validation
+
+  // Function for inserting student
+  void _insertStudent() async {
+    final String studentNumber = studentNumController.text;
+    final String studentName = studentNameController.text;
+    final String gender = selectedGender ?? '';
+    final String courseName = selectedCourse ?? '';
+    final String yearLevel = selectedYearLevel ?? '';
+    final String block = selectedBlock ?? '';
+
+    try {
+      // Insert the subject into the database
+      await DatabaseService().insertStudent(
+        studentNumber,
+        studentName,
+        gender,
+        courseName,
+        block,
+        yearLevel,
+      );
+
+      // Display success message
+      Fluttertoast.showToast(
+        msg: 'Student: $studentName added!',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+      );
+      // Print variables if successfully inserted
+      print('Student Number: $studentNumber');
+      print('Student Name: $studentName');
+      print('Gender: $gender');
+      print('Course Name: $courseName');
+      print('Year Level: $yearLevel');
+      print('Block: $block');
+    } catch (error) {
+      // Handle errors
+      print('Error inserting student: $error');
+
+      // Display error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error inserting student: $error'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,6 +103,11 @@ class _AddStudentState extends State<AddStudent> {
                       // HEADER
                       Column(
                         children: [
+                          Image.asset(
+                            'lib/images/nfc2.png',
+                            width: 150,
+                            height: 150,
+                          ),
                           // top green
                           Container(
                             decoration: const BoxDecoration(
@@ -131,60 +184,60 @@ class _AddStudentState extends State<AddStudent> {
                               const SizedBox(
                                 height: 16,
                               ),
-                              // TextFieldContainer(
-                              //   label: "Irregular Student",
-                              //   inputWidget: Column(
-                              //     crossAxisAlignment: CrossAxisAlignment.start,
-                              //     children: [
-                              //       RadioListTile<String>(
-                              //         title: const Text(
-                              //           'Yes',
-                              //           style: TextStyle(
-                              //               fontFamily: "Roboto",
-                              //               fontWeight: FontWeight.w400),
-                              //         ),
-                              //         value: 'Yes',
-                              //         groupValue: isIrregular,
-                              //         onChanged: (value) {
-                              //           setState(() {
-                              //             isIrregular = value!;
-                              //             showErrorTextIrreg = false;
-                              //           });
-                              //         },
-                              //         activeColor: Color(0xff16A637),
-                              //       ),
-                              //       RadioListTile<String>(
-                              //         title: const Text(
-                              //           'No',
-                              //           style: TextStyle(
-                              //               fontFamily: "Roboto",
-                              //               fontWeight: FontWeight.w400),
-                              //         ),
-                              //         value: 'No',
-                              //         groupValue: isIrregular,
-                              //         onChanged: (value) {
-                              //           setState(() {
-                              //             isIrregular = value!;
-                              //             showErrorTextIrreg = false;
-                              //           });
-                              //         },
-                              //         activeColor: Color(0xff16A637),
-                              //       ),
-                              //       showErrorTextIrreg == true
-                              //           ? Text(
-                              //               errorText,
-                              //               style: TextStyle(
-                              //                   color: Color.fromARGB(
-                              //                       255, 192, 0, 0),
-                              //                   fontSize: 12),
-                              //             )
-                              //           : const SizedBox(),
-                              //     ],
-                              //   ),
-                              // ),
-                              // const SizedBox(
-                              //   height: 16,
-                              // ),
+                              TextFieldContainer(
+                                label: "Gender",
+                                inputWidget: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    RadioListTile<String>(
+                                      title: const Text(
+                                        'Male',
+                                        style: TextStyle(
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      value: 'Male',
+                                      groupValue: selectedGender,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selectedGender = value!;
+                                          showErrorTextIrreg = false;
+                                        });
+                                      },
+                                      activeColor: Color(0xff16A637),
+                                    ),
+                                    RadioListTile<String>(
+                                      title: const Text(
+                                        'Female',
+                                        style: TextStyle(
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      value: 'Female',
+                                      groupValue: selectedGender,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selectedGender = value!;
+                                          showErrorTextIrreg = false;
+                                        });
+                                      },
+                                      activeColor: Color(0xff16A637),
+                                    ),
+                                    showErrorTextIrreg == true
+                                        ? Text(
+                                            errorText,
+                                            style: TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 192, 0, 0),
+                                                fontSize: 12),
+                                          )
+                                        : const SizedBox(),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 16,
+                              ),
                               TextFieldContainer(
                                 label: "Course",
                                 inputWidget: Column(
@@ -603,7 +656,7 @@ class _AddStudentState extends State<AddStudent> {
                               StyledButton(
                                   btnText: "Submit",
                                   onClick: () {
-                                    handleSubmit(context);
+                                    _insertStudent();
                                   })
                             ],
                           ))
@@ -622,111 +675,5 @@ class _AddStudentState extends State<AddStudent> {
         ),
       ),
     );
-  }
-
-  Future<void> handleSubmit(BuildContext context) async {
-    // IF FORM IS EMPTY OR SKIPPED
-    if (!_registrationFormKey.currentState!.validate() ||
-        // isIrregular == null ||
-        selectedBlock == null ||
-        selectedCourse == null ||
-        selectedYearLevel == null) {
-      // if (isIrregular == null) {
-      //   setState(() {
-      //     showErrorTextIrreg = true;
-      //   });
-      // }
-      if (selectedBlock == null) {
-        setState(() {
-          showErrorTextBlock = true;
-        });
-      }
-      if (selectedCourse == null) {
-        setState(() {
-          showErrorTextCourse = true;
-        });
-      }
-      if (selectedYearLevel == null) {
-        setState(() {
-          showErrorTextYearLevel = true;
-        });
-      }
-      return;
-    } else {
-      setState(() {
-        isLoading = true;
-      });
-      // IF FORM IS NOT EMPTY
-      try {
-        final studentNum = studentNumController.text;
-        final studentName = studentNameController.text;
-        // final isIrregStatus = isIrregular;
-        final courseName = selectedCourse;
-        final yearLevel = selectedYearLevel;
-        final block = selectedBlock;
-
-        // CHECK FIRST IF STUDENT EXIST
-        final existingStudent = await FirebaseFirestore.instance
-            .collection('students')
-            .where('student_num', isEqualTo: studentNum)
-            .get();
-
-        if (existingStudent.docs.isNotEmpty) {
-          // Student already exists, show an error or take necessary action
-          Fluttertoast.showToast(
-            msg: "A student with this Student Number already exists!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Color.fromARGB(255, 214, 214, 214),
-            textColor: Colors.black,
-            fontSize: 16.0,
-          );
-          setState(() {
-            isLoading = false;
-          });
-          return;
-        }
-
-        // INSERT STUDENT
-
-        FirebaseFirestore.instance.collection('students').add({
-          'student_num': studentNum,
-          'full_name': studentName,
-          // 'isIrregular': isIrregStatus,
-          'course': courseName,
-          'year_level': yearLevel,
-          'nfc_written': false,
-          'block': block
-        }).then((_) {
-          setState(() {
-            studentNumController.clear();
-            studentNameController.clear();
-            // isIrregular = null;
-            selectedCourse = null;
-            selectedYearLevel = null;
-            selectedBlock = null;
-            isLoading = false;
-          });
-
-          Fluttertoast.showToast(
-              msg: "Student Added!",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Color.fromARGB(255, 214, 214, 214),
-              textColor: Colors.black,
-              fontSize: 16.0);
-          print("Student added");
-        }).catchError((e) {
-          print('Failed to add student: $e');
-          setState(() {
-            isLoading = false;
-          });
-        });
-      } catch (e) {
-        print('error inserting data: $e');
-      }
-    }
   }
 }

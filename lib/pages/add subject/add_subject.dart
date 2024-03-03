@@ -15,23 +15,24 @@ class AddSubject extends StatefulWidget {
 
 class _AddSubjectState extends State<AddSubject> {
   final TextEditingController _subjectController = TextEditingController();
+  String? selectedCourse;
 
   void _submitSubject() async {
     // Retrieve the subject name from the text field
     String subjectName = _subjectController.text.trim();
-
+    final courseName = selectedCourse;
     // Print the subject name to verify
     print('Subject name: $subjectName');
+    print('Crouse name: $courseName');
 
     // Perform validation if needed
 
     // Insert the subject into the database
-    await DatabaseService()
-        .insertSubject(subjectName, 'Bachelor of Science in Computer Science');
+    await DatabaseService().insertSubject(subjectName, courseName);
 
     // Show a toast or message to indicate successful submission
     Fluttertoast.showToast(
-      msg: 'Subject: $subjectName added!',
+      msg: 'Subject: $subjectName added! Course: $courseName added!',
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
     );
@@ -113,6 +114,236 @@ class _AddSubjectState extends State<AddSubject> {
                   hintText: 'Enter subject name',
                 ),
               ),
+              TextFieldContainer(
+                label: "Course",
+                inputWidget: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      // height: 65,
+                      // width: 65,
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        value: selectedCourse,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedCourse = newValue ?? '';
+                          });
+                        },
+                        items: [
+                          DropdownMenuItem<String>(
+                            value: "Bachelor of Science in Computer Science",
+                            child: Text(
+                              "BSCS",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: "Bachelor of Science in Information System",
+                            child: Text(
+                              "BSIS",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value:
+                                "Bachelor of Science in Information Technology",
+                            child: Text(
+                              "BSIT",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value:
+                                "Bachelor of Science in Information Technology major in Animation",
+                            child: Text(
+                              "BSIT - Animation",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value:
+                                "Bachelor of Science in Electronics Engineering",
+                            child: Text(
+                              "BSEE",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value:
+                                "Bachelor of Science in Computer Engineering",
+                            child: Text(
+                              "BSCoE",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: "Bachelor of Elementary Education",
+                            child: Text(
+                              "BEEd",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value:
+                                "Bachelor of Secondary Education major in Math",
+                            child: Text(
+                              "BSEd - Math",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value:
+                                "Bachelor of Secondary Education major in English",
+                            child: Text(
+                              "BSEd - English",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value:
+                                "Bachelor of Technology and Livelihood Education major in ICT",
+                            child: Text(
+                              "BTLED - ICT",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value:
+                                "Bachelor of Technology and Livelihood Education major in HE",
+                            child: Text(
+                              "BTLED - HE",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value:
+                                "Bachelor of Science in Automotive Technology",
+                            child: Text(
+                              "BSAT",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value:
+                                "Bachelor of Science in Electronics Technology",
+                            child: Text(
+                              "BSET",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: "Bachelor of Science in Entrepreneurship",
+                            child: Text(
+                              "BSEntrep",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: "Bachelor of Science in Nursing",
+                            child: Text(
+                              "BSN",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          // Add your new courses here
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               SizedBox(height: 20),
               StyledButton(
                 btnText: 'Add Subject',
