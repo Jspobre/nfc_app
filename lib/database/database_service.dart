@@ -69,7 +69,7 @@ class DatabaseService {
 
 // Insert student
   Future<void> insertStudent(String studentNum, String fullName, String gender,
-      String course, String block, int yearLevel) async {
+      String course, String block, String yearLevel) async {
     // Get a reference to the database
     final db = await database;
 

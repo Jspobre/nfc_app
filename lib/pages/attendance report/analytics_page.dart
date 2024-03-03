@@ -432,7 +432,7 @@ class AnalyticsPage extends ConsumerWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 4),
                                 child: Text(
-                                  student['presents'],
+                                  student['presents'].toString(),
                                   style: const TextStyle(
                                       fontFamily: "Roboto",
                                       fontWeight: FontWeight.w500),
@@ -442,7 +442,7 @@ class AnalyticsPage extends ConsumerWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 4),
                                 child: Text(
-                                  student['lates'],
+                                  student['absents'].toString(),
                                   style: const TextStyle(
                                       fontFamily: "Roboto",
                                       fontWeight: FontWeight.w500),
@@ -452,7 +452,7 @@ class AnalyticsPage extends ConsumerWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 4),
                                 child: Text(
-                                  student['absents'],
+                                  student['lates'].toString(),
                                   style: const TextStyle(
                                       fontFamily: "Roboto",
                                       fontWeight: FontWeight.w500),

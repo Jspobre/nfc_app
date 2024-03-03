@@ -542,32 +542,30 @@ class AttendanceSection extends ConsumerWidget {
                           print('test insert');
                           final dbService = DatabaseService();
 
-                          final subjectId = await dbService.insertSubject(
-                              'test sub',
-                              "Bachelor of Science in Information Technology");
-                          final schedId = await dbService.insertSched(
-                              subjectId, "Wed", "9AM", '12PM');
+                          // final subjectId = await dbService.insertSubject(
+                          //     'Capstone',
+                          //     "Bachelor of Science in Computer Science");
+                          // final schedId = await dbService.insertSched(
+                          //     subjectId, "Sunday", "9AM", '12PM');
                           await dbService.insertStudent(
-                              '17',
-                              'COFFEE BREAK',
+                              '5',
+                              'Jonnel sheesh',
                               'Male',
-                              'Bachelor of Science in Information Technology',
+                              'Bachelor of Science in Computer Science',
                               "A",
-                              1);
+                              "1st Year");
 
-                          await dbService
-                              .assignSubject('17', subjectId)
-                              .then((value) {
+                          await dbService.assignSubject('5', 1).then((value) {
                             print('sheesh');
                           });
 
-                          print(subjectId);
-                          print(schedId);
+                          // print(subjectId);
+                          // print(schedId);
                           await dbService
                               .insertAttendance(
-                                  '17',
-                                  schedId,
-                                  DateTime.now().microsecondsSinceEpoch,
+                                  '5',
+                                  1,
+                                  selectedMonth.microsecondsSinceEpoch,
                                   'Present')
                               .then((value) {
                             print('success');
