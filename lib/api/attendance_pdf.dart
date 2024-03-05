@@ -10,87 +10,176 @@ import 'package:printing/printing.dart';
 
 class AttendancePdf {
   static Future<void> generate(
-      List<dynamic> attendanceData, String formattedDate) async {
+      List<dynamic> attendanceData,
+      String formattedDate,
+      bool isAnalytics,
+      String? courseBlockSubject,
+      String? schedDetail) async {
     final pdf = Document();
 
     final buLogo = MemoryImage(
       (await rootBundle.load('lib/images/logo_1.png')).buffer.asUint8List(),
     );
 
-    pdf.addPage(
-      MultiPage(
-          pageTheme: _buildTheme(
-            PdfPageFormat.legal, //! PAGE FORMAT
-            await PdfGoogleFonts.robotoRegular(),
-            await PdfGoogleFonts.robotoBold(),
-            await PdfGoogleFonts.robotoItalic(),
-          ),
-          header: (Context context) =>
-              _buildHeader(context, buLogo, formattedDate),
-          footer: _buildFooter,
-          build: (context) {
-            final List<List<String>> tableData = [];
+    if (isAnalytics && courseBlockSubject != null && schedDetail != null) {
+      pdf.addPage(
+        MultiPage(
+            pageTheme: _buildTheme(
+              PdfPageFormat.legal, //! PAGE FORMAT
+              await PdfGoogleFonts.robotoRegular(),
+              await PdfGoogleFonts.robotoBold(),
+              await PdfGoogleFonts.robotoItalic(),
+            ),
+            header: (Context context) => _buildAnalyticsHeader(
+                context, formattedDate, courseBlockSubject, schedDetail),
+            // footer: _buildFooter,
+            build: (context) {
+              final List<List<String>> tableData = [];
 
-            int lastNumber = 0;
+              int lastNumber = 0;
 
-            // Add rows dynamically based on the attendanceData
-            for (int i = 0; i < attendanceData.length; i++) {
-              final data = attendanceData[i];
-              lastNumber = i + 1; // Update lastNumber
-              tableData.add([
-                lastNumber.toString(),
-                data is AttendanceRaw
-                    ? data.fullName
-                    : (data as IndivStudent).fullName,
-                lastNumber.toString()
-              ]);
-            }
+              // Add rows dynamically based on the attendanceData
+              for (int i = 0; i < attendanceData.length; i++) {
+                final data = attendanceData[i];
+                lastNumber = i + 1; // Update lastNumber
+                tableData.add([
+                  lastNumber.toString(),
+                  data['fullName'].toString(),
+                  data['presents'].toString(),
+                  data['absents'].toString(),
+                  data['lates'].toString()
+                ]);
+              }
 
-            // Add empty rows if the data length is less than 50
-            for (int i = lastNumber + 1; i <= 50; i++) {
-              tableData.add([i.toString(), '', i.toString()]);
-            }
+              // Add empty rows if the data length is less than 50
+              for (int i = lastNumber + 1; i <= 50; i++) {
+                tableData.add([i.toString(), '', '', '', '']);
+              }
 
-            return <Widget>[
-              TableHelper.fromTextArray(
-                context: context,
-                cellAlignment: Alignment.center,
-                data: const <List<String>>[
-                  <String>['No.', 'NAMES', 'SIGNATURE'],
-                ],
-                columnWidths: {
-                  0: FixedColumnWidth(30.0),
-                  1: FlexColumnWidth(),
-                  2: FixedColumnWidth(150.0),
-                },
-              ),
-              TableHelper.fromTextArray(
-                headerPadding:
-                    EdgeInsets.symmetric(vertical: 0.5, horizontal: 5),
-                cellPadding: EdgeInsets.symmetric(vertical: 0.5, horizontal: 5),
-                context: context,
-                cellAlignments: {
-                  0: Alignment.center,
-                  1: Alignment.centerLeft,
-                  2: Alignment.centerRight,
-                },
-                data: tableData,
-                columnWidths: {
-                  0: FixedColumnWidth(30.0),
-                  1: FlexColumnWidth(),
-                  2: FixedColumnWidth(150.0),
-                },
-                headerStyle:
-                    TextStyle(fontWeight: FontWeight.normal, fontSize: 11),
-                cellStyle: TextStyle(fontSize: 11),
-              ),
-            ];
-          }),
-    );
+              return <Widget>[
+                TableHelper.fromTextArray(
+                  context: context,
+                  cellAlignment: Alignment.center,
+                  data: const <List<String>>[
+                    <String>['No.', 'NAME', 'PRESENTS', 'ABSENTS', "LATES"],
+                  ],
+                  columnWidths: {
+                    0: FixedColumnWidth(40),
+                    1: FlexColumnWidth(),
+                    2: FixedColumnWidth(70),
+                    3: FixedColumnWidth(65),
+                    // 3: FixedColumnWidth(120.0),
+                    4: FixedColumnWidth(50),
+                  },
+                ),
+                TableHelper.fromTextArray(
+                  headerPadding:
+                      EdgeInsets.symmetric(vertical: 0.5, horizontal: 5),
+                  cellPadding:
+                      EdgeInsets.symmetric(vertical: 0.5, horizontal: 5),
+                  context: context,
+                  cellAlignments: {
+                    0: Alignment.center,
+                    1: Alignment.centerLeft,
+                    2: Alignment.center,
+                    3: Alignment.center,
+                    4: Alignment.center,
+                  },
+                  data: tableData,
+                  columnWidths: {
+                    0: FixedColumnWidth(40),
+                    1: FlexColumnWidth(),
+                    2: FixedColumnWidth(70),
+                    3: FixedColumnWidth(65),
+                    4: FixedColumnWidth(50),
+                  },
+                  headerStyle:
+                      TextStyle(fontWeight: FontWeight.normal, fontSize: 11),
+                  cellStyle: TextStyle(fontSize: 11),
+                ),
+              ];
+            }),
+      );
 
-    AttendancePdf.saveDocument(name: "attendance_pdf.pdf", pdf: pdf);
+      AttendancePdf.saveDocument(name: "analytics_report.pdf", pdf: pdf);
+    } else {
+      pdf.addPage(
+        MultiPage(
+            pageTheme: _buildTheme(
+              PdfPageFormat.legal, //! PAGE FORMAT
+              await PdfGoogleFonts.robotoRegular(),
+              await PdfGoogleFonts.robotoBold(),
+              await PdfGoogleFonts.robotoItalic(),
+            ),
+            header: (Context context) =>
+                _buildHeader(context, buLogo, formattedDate),
+            footer: _buildFooter,
+            build: (context) {
+              final List<List<String>> tableData = [];
+
+              int lastNumber = 0;
+
+              // Add rows dynamically based on the attendanceData
+              for (int i = 0; i < attendanceData.length; i++) {
+                final data = attendanceData[i];
+                lastNumber = i + 1; // Update lastNumber
+                tableData.add([
+                  lastNumber.toString(),
+                  data is AttendanceRaw
+                      ? data.fullName
+                      : (data as IndivStudent).fullName,
+                  '${data is AttendanceRaw ? data.status : 'Absent '}                 ${lastNumber.toString()}'
+                ]);
+              }
+
+              // Add empty rows if the data length is less than 50
+              for (int i = lastNumber + 1; i <= 50; i++) {
+                tableData.add([i.toString(), '', i.toString()]);
+              }
+
+              return <Widget>[
+                TableHelper.fromTextArray(
+                  context: context,
+                  cellAlignment: Alignment.center,
+                  data: const <List<String>>[
+                    <String>['No.', 'NAMES', 'SIGNATURE'],
+                  ],
+                  columnWidths: {
+                    0: FixedColumnWidth(30.0),
+                    1: FlexColumnWidth(),
+                    2: FixedColumnWidth(150.0),
+                  },
+                ),
+                TableHelper.fromTextArray(
+                  headerPadding:
+                      EdgeInsets.symmetric(vertical: 0.5, horizontal: 5),
+                  cellPadding:
+                      EdgeInsets.symmetric(vertical: 0.5, horizontal: 5),
+                  context: context,
+                  cellAlignments: {
+                    0: Alignment.center,
+                    1: Alignment.centerLeft,
+                    2: Alignment.centerRight,
+                  },
+                  data: tableData,
+                  columnWidths: {
+                    0: FixedColumnWidth(30.0),
+                    1: FlexColumnWidth(),
+                    2: FixedColumnWidth(150.0),
+                  },
+                  headerStyle:
+                      TextStyle(fontWeight: FontWeight.normal, fontSize: 11),
+                  cellStyle: TextStyle(fontSize: 11),
+                ),
+              ];
+            }),
+      );
+
+      AttendancePdf.saveDocument(name: "attendance_pdf.pdf", pdf: pdf);
+    }
   }
 
+// for attendance report
   static Widget _buildHeader(
       Context context, MemoryImage buLogo, String formattedDate) {
     return Column(
@@ -164,6 +253,44 @@ class AttendancePdf {
     );
   }
 
+  // header for analytics
+  static Widget _buildAnalyticsHeader(Context context, String formattedDate,
+      String courseBlockSub, String schedDetails) {
+    return Column(
+      children: [
+        Text(
+          'ANALYTICS REPORT',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text(
+            courseBlockSub,
+            style: TextStyle(fontSize: 11),
+          ),
+          Text(
+            schedDetails,
+            style: TextStyle(fontSize: 11),
+          ),
+          Text(
+            formattedDate,
+            style: TextStyle(fontSize: 11),
+          ),
+        ]),
+        // DIVIDER / UNDERLINE
+        Divider(
+          thickness: 3,
+          // height: 1,
+        ),
+        SizedBox(
+          height: 10,
+        ),
+      ],
+    );
+  }
+
   static Widget _buildFooter(Context context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end, // Align content at the bottom
@@ -173,7 +300,7 @@ class AttendancePdf {
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
         Text("Effective Date: November 4, 2019",
             style: TextStyle(fontSize: 11)),
-        Text("Revision: 0", style: TextStyle(fontSize: 11))
+        Text("Revision: 0", style: TextStyle(fontSize: 11)),
       ],
     );
   }

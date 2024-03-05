@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:nfc_app/api/attendance_pdf.dart';
 import 'package:nfc_app/model/fetch_data.dart';
 import 'package:nfc_app/pages/attendance%20report/filter_page.dart';
 import 'package:nfc_app/provider/attendanceData_provider.dart';
@@ -133,13 +134,19 @@ class AnalyticsPage extends ConsumerWidget {
                           (selectedFilters['gender'] == element.gender ||
                               selectedFilters['gender'] == 'All');
                     }).where((element) {
-                      return element.datetime.isAfter(selectedDates.start) &&
-                          element.datetime.isBefore(selectedDates.end);
+                      print(element.datetime);
+                      return element.datetime.isAfter(selectedDates.start
+                              .subtract(Duration(days: 1))) &&
+                          element.datetime.isBefore(
+                              selectedDates.end.add(Duration(days: 1)));
                     }).toList();
                   },
                   error: (error, stackTrace) => [],
                   loading: () => [],
                 );
+
+                print("filtered students in analytics:");
+                print(filteredAttendance);
 
                 // Extract the list of all the students enrolled in the subject
                 List<IndivStudent> classList = studentList.when(
@@ -161,18 +168,30 @@ class AnalyticsPage extends ConsumerWidget {
                     error: (error, stackTrace) => [],
                     loading: () => []);
 
+                print("class list in analytics");
+                print(classList);
+
                 // Sort entries by datetime
                 List<AttendanceRaw> sortedList = List.from(filteredAttendance)
                   ..sort((a, b) => a.datetime.compareTo(b.datetime));
 
+                print("sortedList logic");
+                print(sortedList);
+
                 // Group entries with the same DateTime
                 Map<DateTime, List<AttendanceRaw>> groupedEntries = {};
                 sortedList.forEach((entry) {
-                  if (!groupedEntries.containsKey(entry.datetime)) {
-                    groupedEntries[entry.datetime] = [];
+                  if (!groupedEntries.containsKey(DateTime(entry.datetime.year,
+                      entry.datetime.month, entry.datetime.day))) {
+                    groupedEntries[DateTime(entry.datetime.year,
+                        entry.datetime.month, entry.datetime.day)] = [];
                   }
-                  groupedEntries[entry.datetime]!.add(entry);
+                  groupedEntries[DateTime(entry.datetime.year,
+                          entry.datetime.month, entry.datetime.day)]!
+                      .add(entry);
                 });
+                print("grouped entries without absent students");
+                print(groupedEntries);
 
                 // Loop through each keys and add the absent students in the list of attendance
                 groupedEntries.forEach((key, value) {
@@ -270,10 +289,44 @@ class AnalyticsPage extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
+                        // ! EXPORT BUTTON
                         IconButton(
-                          onPressed: () async {},
+                          onPressed: () async {
+                            try {
+                              await AttendancePdf.generate(
+                                  result,
+                                  selectedDates.start.month ==
+                                              selectedDates.end.month &&
+                                          selectedDates.start.day ==
+                                              selectedDates.end.day &&
+                                          selectedDates.start.year ==
+                                              selectedDates.end.year
+                                      ? '${DateFormat('MMMM dd, yyyy').format(selectedDates.start)}'
+                                      : '${DateFormat('MMMM dd, yyyy').format(selectedDates.start)} - ${DateFormat('MMMM dd, yyyy').format(selectedDates.end)}',
+                                  true,
+                                  (selectedFilters[
+                                                  'course'] as String)
+                                              .isNotEmpty &&
+                                          (selectedFilters['subject'] as int) !=
+                                              0 &&
+                                          (selectedFilters['sched'] as int) != 0
+                                      ? '${courseAbbreviation} ${(selectedFilters['yearLevel'] as String)[0]}${selectedFilters['block']} - ${subjectName}'
+                                      : 'NO SCHEDULE SELECTED',
+                                  (selectedFilters[
+                                                  'course'] as String)
+                                              .isNotEmpty &&
+                                          (selectedFilters['subject'] as int) !=
+                                              0 &&
+                                          (selectedFilters['sched'] as int) != 0
+                                      ? '$schedDetail'
+                                      : ''); //! Pass the data
+                            } catch (e) {
+                              print("error generating pdf: $e");
+                            }
+                          },
                           icon: Icon(Icons.picture_as_pdf_outlined),
                         ),
+                        // ! DATE RANGE PICKER
                         IconButton(
                           onPressed: () async {
                             final DateTimeRange? dateTimeRange =
@@ -297,6 +350,7 @@ class AnalyticsPage extends ConsumerWidget {
                         const SizedBox(
                           width: 10,
                         ),
+                        // ! FILTERS
                         StyledButton(
                           btnText: "Filters",
                           onClick: () {
@@ -356,20 +410,32 @@ class AnalyticsPage extends ConsumerWidget {
                     ),
                     Table(
                         columnWidths: const {
-                          0: FlexColumnWidth(),
-                          1: FixedColumnWidth(70),
+                          0: FixedColumnWidth(40),
+                          1: FlexColumnWidth(),
                           2: FixedColumnWidth(70),
+                          3: FixedColumnWidth(65),
                           // 3: FixedColumnWidth(120.0),
-                          3: FixedColumnWidth(50),
+                          4: FixedColumnWidth(50),
                         },
                         border: TableBorder
                             .all(), // Allows to add a border decoration around your table
                         children: [
-                          const TableRow(
+                          TableRow(
                               decoration: BoxDecoration(
                                 color: Color(0xFFCDCDCD), // Set the color here
                               ),
                               children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 4),
+                                  child: Text(
+                                    '${result.length}',
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w500),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 4),
@@ -418,6 +484,16 @@ class AnalyticsPage extends ConsumerWidget {
                           // display the results
                           for (final student in result)
                             TableRow(children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 4),
+                                child: Text(
+                                  '${result.indexOf(student) + 1}',
+                                  style: const TextStyle(
+                                      fontFamily: "Roboto",
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 4),

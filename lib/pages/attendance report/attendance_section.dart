@@ -228,7 +228,11 @@ class AttendanceSection extends ConsumerWidget {
                           onPressed: () async {
                             try {
                               await AttendancePdf.generate(
-                                  mergedList, formattedDate); //! Pass the data
+                                  mergedList,
+                                  formattedDate,
+                                  false,
+                                  null,
+                                  null); //! Pass the data
                             } catch (e) {
                               print("error generating pdf: $e");
                             }
@@ -533,48 +537,66 @@ class AttendanceSection extends ConsumerWidget {
                               ),
                             ]),
                         ]),
-                    StyledButton(
-                        noShadow: true,
-                        btnIcon: Icon(Icons.picture_as_pdf),
-                        iconOnRight: true,
-                        btnText: "insert test data",
-                        onClick: () async {
-                          print('test insert');
-                          final dbService = DatabaseService();
+                    // StyledButton(
+                    //     noShadow: true,
+                    //     btnIcon: Icon(Icons.picture_as_pdf),
+                    //     iconOnRight: true,
+                    //     btnText: "insert test data",
+                    //     onClick: () async {
+                    //       print('test insert');
+                    //       final dbService = DatabaseService();
 
-                          // final subjectId = await dbService.insertSubject(
-                          //     'Capstone',
-                          //     "Bachelor of Science in Computer Science");
-                          // final schedId = await dbService.insertSched(
-                          //     subjectId, "Sunday", "9AM", '12PM');
-                          await dbService.insertStudent(
-                              '5',
-                              'Jonnel sheesh',
-                              'Male',
-                              'Bachelor of Science in Computer Science',
-                              "A",
-                              "1st Year");
+                    //       // final subjectId = await dbService.insertSubject(
+                    //       //     'Capstone',
+                    //       //     "Bachelor of Science in Computer Science");
+                    //       // final schedId = await dbService.insertSched(
+                    //       //     subjectId, "Sunday", "9AM", '12PM');
+                    //       // await dbService.insertStudent(
+                    //       //     '5',
+                    //       //     'Jonnel sheesh',
+                    //       //     'Male',
+                    //       //     'Bachelor of Science in Computer Science',
+                    //       //     "A",
+                    //       //     "1st Year");
 
-                          await dbService.assignSubject('5', 1).then((value) {
-                            print('sheesh');
-                          });
+                    //       // await dbService.assignSubject('5', 1).then((value) {
+                    //       //   print('sheesh');
+                    //       // });
 
-                          // print(subjectId);
-                          // print(schedId);
-                          await dbService
-                              .insertAttendance(
-                                  '5',
-                                  1,
-                                  selectedMonth.microsecondsSinceEpoch,
-                                  'Present')
-                              .then((value) {
-                            print('success');
-                          });
-                          // ignore: unused_result
-                          ref.refresh(studentListProvider);
-                          // ignore: unused_result
-                          ref.refresh(attendanceDataProvider);
-                        }),
+                    //       // print(subjectId);
+                    //       // print(schedId);
+                    //       await dbService
+                    //           .insertAttendance(
+                    //               '2020-8180-91224',
+                    //               1,
+                    //               selectedMonth.microsecondsSinceEpoch,
+                    //               'Present')
+                    //           .then((value) {
+                    //         print('success');
+                    //       });
+                    //       await dbService
+                    //           .insertAttendance(
+                    //               '2020',
+                    //               1,
+                    //               selectedMonth.microsecondsSinceEpoch,
+                    //               'Present')
+                    //           .then((value) {
+                    //         print('success');
+                    //       });
+                    //       // await dbService
+                    //       //     .insertAttendance(
+                    //       //         '2021',
+                    //       //         1,
+                    //       //         selectedMonth.microsecondsSinceEpoch,
+                    //       //         'Present')
+                    //       //     .then((value) {
+                    //       //   print('success');
+                    //       // });
+                    //       // ignore: unused_result
+                    //       ref.refresh(studentListProvider);
+                    //       // ignore: unused_result
+                    //       ref.refresh(attendanceDataProvider);
+                    //     }),
                   ],
                 );
               }),
