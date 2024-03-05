@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 import 'package:nfc_app/widgets/textfield%20container/textfieldContainer.dart';
 import 'package:nfc_app/database/database_service.dart';
@@ -42,15 +43,9 @@ class _AddScheduleState extends State<AddSchedule> {
         selectedDay != null &&
         selectedStartTime != null &&
         selectedEndTime != null) {
-      // Extract the hour and minute from selectedStartTime and selectedEndTime
-      final int startHour = selectedStartTime!.hour;
-      final int startMinute = selectedStartTime!.minute;
-      final int endHour = selectedEndTime!.hour;
-      final int endMinute = selectedEndTime!.minute;
-
-      // Format the time strings as HH:MM
-      final String startTime = '$startHour:$startMinute';
-      final String endTime = '$endHour:$endMinute';
+      // Format the start time and end time
+      String startTime = formatTimeOfDay(selectedStartTime!);
+      String endTime = formatTimeOfDay(selectedEndTime!);
 
       // Insert the schedule into the database
       DatabaseService databaseService = DatabaseService();
@@ -355,6 +350,8 @@ class _AddScheduleState extends State<AddSchedule> {
       setState(() {
         selectedStartTime = pickedTime;
       });
+      String formattedStartTime = formatTimeOfDay(pickedTime);
+      // Now you can use formattedStartTime for display or insertion into the database
     }
   }
 
@@ -367,13 +364,28 @@ class _AddScheduleState extends State<AddSchedule> {
       setState(() {
         selectedEndTime = pickedTime;
       });
+      String formattedEndTime = formatTimeOfDay(pickedTime);
+      // Now you can use formattedEndTime for display or insertion into the database
     }
   }
 
   String formatTimeOfDay(TimeOfDay timeOfDay) {
+    // Convert TimeOfDay to DateTime
     final now = DateTime.now();
     final time = DateTime(
-        now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
-    return TimeOfDay.fromDateTime(time).format(context);
+      now.year,
+      now.month,
+      now.day,
+      timeOfDay.hour,
+      timeOfDay.minute,
+    );
+
+    // Format the time using DateFormat
+    final formattedTime = TimeOfDay.fromDateTime(time).format(context);
+
+    // Format the time to 12-hour format with AM/PM
+    final format = DateFormat.jm(); // 12-hour format with AM/PM
+    return format.format(DateTime(
+        now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute));
   }
 }

@@ -52,6 +52,17 @@ class DatabaseService {
     return await db.query('subjects');
   }
 
+  // Function to fetch the schedules table
+  Future<List<Map<String, dynamic>>> fetchSchedulesWithSubjects() async {
+    final Database db = await database;
+    return await db.rawQuery('''
+    SELECT schedules.*, subjects.subject_name, subjects.course_name
+    FROM schedules
+    JOIN subjects ON schedules.subject_id = subjects.subject_id
+  ''');
+  }
+
+  // function to fetch student lists
   Future<List<Map<String, dynamic>>> fetchStudentLists() async {
     final Database db = await database;
     return await db.query('students');

@@ -3,7 +3,9 @@ import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 
 class ScanModal extends StatelessWidget {
-  const ScanModal({super.key});
+  final String? details;
+
+  const ScanModal({Key? key, this.details}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,6 +14,17 @@ class ScanModal extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
+          if (details != null)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                details!,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           const Text(
             "Ready to Scan",
             style: TextStyle(
@@ -27,14 +40,15 @@ class ScanModal extends StatelessWidget {
             ),
           ),
           StyledButton(
-              noShadow: true,
-              textColor: Colors.black,
-              btnColor: const Color(0xffCECECE),
-              btnText: "Cancel",
-              onClick: () async {
-                await FlutterNfcKit.finish();
-                Navigator.pop(context);
-              }),
+            noShadow: true,
+            textColor: Colors.black,
+            btnColor: const Color(0xffCECECE),
+            btnText: "Cancel",
+            onClick: () async {
+              await FlutterNfcKit.finish();
+              Navigator.pop(context);
+            },
+          ),
         ],
       ),
     );
