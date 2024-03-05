@@ -1,5 +1,4 @@
 import 'package:sqflite/sqflite.dart';
-import '../database/database_service.dart';
 
 class NfcDB {
   // FOR CREATING TABLE DURING INITIALIZATION
@@ -31,7 +30,7 @@ class NfcDB {
       gender TEXT,
       course TEXT,
       block TEXT,
-      year_level INTEGER
+      year_level TEXT
     );""");
 
     await database.execute("""CREATE TABLE IF NOT EXISTS $studentSubjectsTable (

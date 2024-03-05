@@ -26,14 +26,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
-        textTheme: GoogleFonts.poppinsTextTheme().copyWith(
-          bodyLarge: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-          titleLarge: const TextStyle(
-              fontSize: 20, letterSpacing: 1, fontWeight: FontWeight.w500),
-        ),
+        // textTheme: GoogleFonts.robotoTextTheme().copyWith(
+        //   bodyLarge: const TextStyle(
+        //     fontSize: 16,
+        //     fontWeight: FontWeight.w500,
+        //   ),
+        //   titleLarge: const TextStyle(
+        //       fontSize: 20, letterSpacing: 1, fontWeight: FontWeight.w500),
+        // ),
         appBarTheme: const AppBarTheme(
           // centerTitle: true,
           titleTextStyle: TextStyle(

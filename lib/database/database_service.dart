@@ -164,7 +164,7 @@ class DatabaseService {
 
   // ! FOR REPORTS & ANALYTICS
   // Fetch all attendance data
-  Future<List<Map<String, dynamic>>> fetchAttendanceData(scheduleId) async {
+  Future<List<Map<String, dynamic>>> fetchAttendanceData() async {
     final db = await database;
     return await db.rawQuery('''
     SELECT attendance.*, students.*, schedules.*, subjects.subject_name
@@ -172,37 +172,28 @@ class DatabaseService {
     INNER JOIN students ON attendance.student_num = students.student_num
     INNER JOIN schedules ON attendance.schedule_id = schedules.schedule_id
     INNER JOIN subjects ON schedules.subject_id = subjects.subject_id
-    WHERE attendance.schedule_id = ${scheduleId}
   ''');
   }
 
   // Fetch all student enrolled in the selected subject
-  Future<List<Map<String, dynamic>>> fetchStudentsList(
-      subjectId, yearLevel, block, course, gender) async {
+  Future<List<Map<String, dynamic>>> fetchStudentsList() async {
     final db = await database;
     return await db.rawQuery('''
     SELECT student_subjects.student_num, student_subjects.subject_id, students.*
     FROM student_subjects
     INNER JOIN students ON student_subjects.student_num = students.student_num
-    INNER JOIN subjects ON student_subjects.subject_id = subjects.subject_id
-    WHERE student_subjects.subject_id = ? 
-    AND students.year_level = ? 
-    AND students.block = ? 
-    AND students.course = ? 
-    AND students.gender = ?''', [subjectId, yearLevel, block, course, gender]);
+    INNER JOIN subjects ON student_subjects.subject_id = subjects.subject_id''');
   }
 
   // Fetch course dropdown options
-  Future<List<String>> fetchCourseOptions() async {
-    final db = await database;
-    final result = await db.rawQuery('''
+  Future<List<String>> fetchDistinctCourseOptions() async {
+    final Database db = await database; // Initialize your database
+    final List<Map<String, dynamic>> courses = await db.rawQuery('''
     SELECT DISTINCT course_name
     FROM subjects
-''');
-    List<String> tempList =
-        result.map((e) => e['course_name'] as String).toList();
-
-    return tempList;
+  ''');
+    return List<String>.from(
+        courses.map((course) => course['course_name'] as String));
   }
 
   // Fetch subject dropdown options
@@ -223,5 +214,43 @@ class DatabaseService {
       FROM schedules
       WHERE subject_id = ?
   ''', [subjectId]);
+  }
+
+  // Fetch subjectName
+  Future<String> fetchSubjectName(int subjectId) async {
+    final Database db = await database;
+    List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT subject_name
+    FROM subjects
+    WHERE subject_id = ?
+  ''', [subjectId]);
+
+    // Check if any result is returned
+    if (result.isNotEmpty) {
+      // Extract and return the subject name
+      return result.first['subject_name'];
+    } else {
+      // Return null if no result found
+      return '';
+    }
+  }
+
+  // Fetch sched Details
+  Future<String> fetchSchedDetails(int schedId) async {
+    final Database db = await database;
+    List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT day,start_time, end_time
+    FROM schedules
+    WHERE schedule_id = ?
+  ''', [schedId]);
+
+    // Check if any result is returned
+    if (result.isNotEmpty) {
+      // Extract and return the subject name
+      return '${result.first['day']}, ${result.first['start_time']} - ${result.first['end_time']}';
+    } else {
+      // Return null if no result found
+      return '';
+    }
   }
 }

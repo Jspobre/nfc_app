@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 int dayValue = 0; //0 for today
@@ -16,9 +17,14 @@ final dayValueProvider = StateProvider<int>((ref) => 0);
 final monthValueProvider = StateProvider<int>((ref) => 0);
 final datePickerSelectedProvider = StateProvider<DateTime?>((ref) => null);
 
-
-
-
-
 // FOR ANALYTICS
-
+// DateTimeRange selectedDates = DateTimeRange(
+//   start: DateTime.now(),
+//   end: DateTime.now(),
+// );
+final selectedDateRangeProvider = StateProvider<DateTimeRange>(
+  (ref) => DateTimeRange(
+    start: DateTime.now(),
+    end: DateTime.now(),
+  ),
+);
