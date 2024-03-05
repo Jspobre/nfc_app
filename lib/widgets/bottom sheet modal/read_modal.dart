@@ -6,7 +6,7 @@ import 'package:nfc_app/database/database_service.dart'; // Import your database
 class ReadModal extends StatelessWidget {
   final bool reverse;
   final void Function(String subjectName, String courseName, String day,
-      String startTime, String endTime) selectSchedule;
+      String startTime, String endTime, int scheduleId) selectSchedule;
 
   const ReadModal({
     Key? key,
@@ -43,7 +43,7 @@ class ReadModal extends StatelessWidget {
                   children: ListTile.divideTiles(
                     context: context,
                     tiles: schedules.map((schedule) {
-                      final int? scheduleId = schedule['subject_id'];
+                      final int scheduleId = schedule['schedule_id'];
                       final int? subjectId = schedule['subject_id'];
                       final String day = schedule['day'];
                       final String startTime = schedule['start_time'];
@@ -103,7 +103,7 @@ class ReadModal extends StatelessWidget {
                           // You can handle onTap event here
                           // For now, passing empty strings
                           selectSchedule(subjectName, courseAbbreviation, day,
-                              startTime, endTime);
+                              startTime, endTime, scheduleId);
                         },
                       );
                     }).toList(),
