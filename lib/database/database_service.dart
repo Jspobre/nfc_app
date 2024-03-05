@@ -253,4 +253,34 @@ class DatabaseService {
       return '';
     }
   }
+
+  // insert Attendance
+  Future<void> insertLateTimeLimit(int timeLimit) async {
+    // Get a reference to the database
+    final db = await database;
+
+    // Insert the subject into the subjects table
+    await db.insert(
+      'late_time',
+      {'minutes': timeLimit},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // Fetch sched Details
+  Future<int> fetchLateTimeLimit() async {
+    final Database db = await database;
+    List<Map<String, dynamic>> results = await db.query('late_time');
+
+    if (results.isNotEmpty) {
+      // Assuming there's only one row, you can retrieve the first row
+      // and extract the value of the 'minutes' column as an int.
+      return results[0]['minutes'] as int;
+    } else {
+      // Handle the case when there are no rows in the table or any other error case.
+      // You might want to return a default value or throw an exception, based on your requirement.
+      // For now, I'm returning 0 as a default value.
+      return 0;
+    }
+  }
 }

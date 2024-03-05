@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 class StyledTextFormField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
+  final TextInputType? keyboardType;
   const StyledTextFormField(
-      {super.key, required this.controller, required this.hintText});
+      {super.key,
+      required this.controller,
+      required this.hintText,
+      this.keyboardType});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +21,7 @@ class StyledTextFormField extends StatelessWidget {
         }
         return null;
       },
-      keyboardType: TextInputType.text,
+      keyboardType: keyboardType ?? TextInputType.text,
       decoration: InputDecoration(
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(
