@@ -12,6 +12,7 @@ import 'package:nfc_app/pages/add%20schedule/add_schedule.dart';
 import 'package:nfc_app/pages/add%20student/add_student.dart';
 import 'package:nfc_app/pages/attendance%20report/attendance_report.dart';
 import 'package:nfc_app/pages/enroll%20student/enroll_student.dart';
+import 'package:nfc_app/pages/set%20late%20time/set_late.dart';
 import 'package:nfc_app/widgets/bottom%20sheet%20modal/floating_modal.dart';
 import 'package:nfc_app/widgets/bottom%20sheet%20modal/modal_inside_modal.dart';
 import 'package:nfc_app/widgets/bottom%20sheet%20modal/read_modal.dart';
@@ -321,6 +322,15 @@ class _HomeState extends State<Home> {
               );
               items.add(
                 const PopupMenuItem<String>(
+                  value: 'timelimit',
+                  child: Text(
+                    "Set late time",
+                    style: TextStyle(fontFamily: "Roboto"),
+                  ),
+                ),
+              );
+              items.add(
+                const PopupMenuItem<String>(
                   value: 'reset',
                   child: Text(
                     "Reset tag",
@@ -365,6 +375,13 @@ class _HomeState extends State<Home> {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (BuildContext context) {
                       return AttendanceReport();
+                    }),
+                  );
+                  break;
+                case 'timelimit':
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return SetLateFormPage();
                     }),
                   );
                   break;

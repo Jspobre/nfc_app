@@ -7,6 +7,7 @@ class NfcDB {
   final studentsTable = 'students';
   final studentSubjectsTable = 'student_subjects';
   final attendanceTable = 'attendance';
+  final lateTimeTable = 'late_time';
 
   Future<void> createTable(Database database) async {
     await database.execute("""CREATE TABLE IF NOT EXISTS $subjectsTable (
@@ -49,6 +50,11 @@ class NfcDB {
       status TEXT,
       FOREIGN KEY (student_num) REFERENCES $studentsTable (student_num),
       FOREIGN KEY (schedule_id) REFERENCES $schedulesTable (schedule_id)
+    );""");
+
+    await database.execute("""CREATE TABLE IF NOT EXISTS $lateTimeTable (
+      id INTEGER PRIMARY KEY,
+      minutes INTEGER
     );""");
   }
 }
