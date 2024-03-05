@@ -1,22 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nfc_app/pages/attendance%20report/analytics_page.dart';
 import 'package:nfc_app/pages/attendance%20report/attendance_section.dart';
+import 'package:nfc_app/provider/attendanceData_provider.dart';
 
-class AttendanceReport extends StatefulWidget {
+class AttendanceReport extends ConsumerWidget {
   const AttendanceReport({super.key});
 
   @override
-  State<AttendanceReport> createState() => _AttendanceReportState();
-}
-
-class _AttendanceReportState extends State<AttendanceReport> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.refresh(attendanceDataProvider);
+    ref.refresh(studentListProvider);
     return DefaultTabController(
       length: 2,
       child: Scaffold(

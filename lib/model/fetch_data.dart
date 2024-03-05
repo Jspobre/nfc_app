@@ -7,6 +7,7 @@ class AttendanceRaw {
   final String gender;
   final String course;
   final String block;
+  final String yearLevel;
   final int subjectId;
   final String day;
   final String startTime;
@@ -21,6 +22,7 @@ class AttendanceRaw {
       required this.gender,
       required this.course,
       required this.block,
+      required this.yearLevel,
       required this.subjectId,
       required this.day,
       required this.startTime,
@@ -33,6 +35,7 @@ class IndivStudent {
   final String gender;
   final String course;
   final String block;
+  final String yearLevel;
   final int subjectId;
 
   IndivStudent({
@@ -41,6 +44,7 @@ class IndivStudent {
     required this.gender,
     required this.course,
     required this.block,
+    required this.yearLevel,
     required this.subjectId,
   });
 }
