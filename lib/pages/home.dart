@@ -8,6 +8,7 @@ import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:ndef/ndef.dart' as ndef;
 import 'package:ndef/utilities.dart';
+import 'package:nfc_app/database/database_service.dart';
 import 'package:nfc_app/pages/add%20schedule/add_schedule.dart';
 import 'package:nfc_app/pages/add%20student/add_student.dart';
 import 'package:nfc_app/pages/attendance%20report/attendance_report.dart';
@@ -28,6 +29,7 @@ import 'package:crypto/crypto.dart';
 import 'package:collection/collection.dart'; // Import the collection package for the `unmodifiableSet` function
 import 'package:nfc_app/pages/add%20subject/add_subject.dart';
 import 'package:nfc_app/pages/add%20schedule/add_schedule.dart';
+import 'package:sqflite/sqflite.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -48,6 +50,7 @@ class _HomeState extends State<Home> {
   bool _scanning = false;
   final DatabaseReference _databaseReference = FirebaseDatabase.instance.ref();
   String _lastScannedData = '';
+
   @override
   void initState() {
     super.initState();
@@ -76,42 +79,29 @@ class _HomeState extends State<Home> {
       backgroundColor: Colors.transparent,
       builder: (context) => ReadModal(
         selectSchedule: (String subjectName, String courseName, String day,
-            String startTime, String endTime) async {
+            String startTime, String endTime, int scheduleId) async {
           await FlutterNfcKit.finish();
           setState(() {
             tappedScheduleInfo =
                 '$subjectName - $courseName - $day: $startTime - $endTime';
           });
+
+          // Start scanning when a detail is tapped
+          startScanning(scheduleId);
+
+          // Show the scan modal
           showBarModalBottomSheet(
             isDismissible: true,
             expand: false,
             context: context,
-            builder: (context) => Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Display selected details
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        tappedScheduleInfo,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ),
-                // Display scan modal
-                ScanModal(),
-              ],
-            ),
+            builder: (context) => ScanModal(details: tappedScheduleInfo),
           );
         },
       ),
     );
   }
 
-  Future<void> startScanning() async {
+  Future<void> startScanning(int scheduleId) async {
     while (true) {
       try {
         NFCTag tag = await FlutterNfcKit.poll();
@@ -145,7 +135,7 @@ class _HomeState extends State<Home> {
                   ''; // Use the null-aware operator to handle null values
             }
           }
-          showDetailsContainer(tag, textContent);
+          showDetailsContainer(tag, textContent, scheduleId);
           setState(() {
             _result = ' $textContent';
           });
@@ -164,13 +154,13 @@ class _HomeState extends State<Home> {
     }
   }
 
-  void showDetailsContainer(NFCTag tag, String scannedData) async {
+  void showDetailsContainer(
+      NFCTag tag, String scannedData, int scheduleId) async {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
 
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings(
-            'nfc'); //this is found in android/app/src/main/res/drawable. Can change to other images
+        AndroidInitializationSettings('nfc');
     final InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
@@ -178,43 +168,23 @@ class _HomeState extends State<Home> {
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     if (tag == null || scannedData.isEmpty) {
-      // Don't insert data if the NFC tag is empty
       return;
     } else {
-      // Check if the same data already exists in the database
       bool dataExists = await checkIfDataExists(scannedData);
 
-      // if (dataExists) {
-      //   print('Data already exists in the database: $scannedData');
-      //   return; // Skip inserting duplicate data
-      // }
-
-      // Check if the current scanned data is the same as the last scanned data
       if (_lastScannedData == scannedData) {
         print('Skipping consecutive duplicate data: $scannedData');
         return;
       }
 
-      _databaseReference.push().set({
-        'timestamp': ServerValue.timestamp,
-        'tag_data': scannedData,
-      }).then((_) {
-        print('Data inserted successfully');
-      }).catchError((error) {
-        print('Error inserting data: $error');
-      });
-
-      // Update the last scanned data
       _lastScannedData = scannedData;
 
-      // Split the scannedData to extract full name and student ID
       List<String> dataParts = scannedData.split(' - ');
-      String fullName = dataParts[0]; // display only the full name
+      String fullName = dataParts[0];
+      String studentNum = dataParts[1];
 
-      // Generate a unique ID based on the hash code of the scannedData to prevent overwrite of the previous notification
       int notificationId = scannedData.hashCode;
 
-      // Configure the notification details
       const AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
         '1',
@@ -231,13 +201,28 @@ class _HomeState extends State<Home> {
       );
 
       await flutterLocalNotificationsPlugin.show(
-        // Use the dynamically generated ID
         notificationId,
         'ATTENDANCE',
         'Student name:\n$fullName',
         platformChannelSpecifics,
         payload: 'item x',
       );
+
+      DatabaseService databaseService = DatabaseService();
+      // Insert attendance data into the database
+      await databaseService.insertAttendance(
+        studentNum,
+        scheduleId,
+        DateTime.now().millisecondsSinceEpoch,
+        'Present',
+      );
+
+      // Print the inserted data
+      print('Attendance data inserted: '
+          'Student Num: $studentNum, '
+          'Schedule ID: $scheduleId, '
+          'Datetime: ${DateTime.now().millisecondsSinceEpoch}, '
+          'Status: Present');
     }
   }
 
