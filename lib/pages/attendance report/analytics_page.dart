@@ -171,9 +171,17 @@ class AnalyticsPage extends ConsumerWidget {
                 print("class list in analytics");
                 print(classList);
 
+                // remove datetime that does not match the sched day (most likely attendance mistakes by prof)
+                List<AttendanceRaw> accurateFilteredAttendance =
+                    filteredAttendance
+                        .where((element) =>
+                            getDayName(element.datetime) == schedDay)
+                        .toList();
+
                 // Sort entries by datetime
-                List<AttendanceRaw> sortedList = List.from(filteredAttendance)
-                  ..sort((a, b) => a.datetime.compareTo(b.datetime));
+                List<AttendanceRaw> sortedList =
+                    List.from(accurateFilteredAttendance)
+                      ..sort((a, b) => a.datetime.compareTo(b.datetime));
 
                 print("sortedList logic");
                 print(sortedList);
@@ -197,6 +205,23 @@ class AnalyticsPage extends ConsumerWidget {
                 groupedEntries.forEach((key, value) {
                   // get day
                   String dayName = value.first.day;
+
+                  List<String> uniqueFullNames = [];
+                  // remove first the duplicate entries of attendance (mistakes)
+                  List<AttendanceRaw> accurateAttendanceList =
+                      groupedEntries[key]!
+                          .map((e) {
+                            if (!uniqueFullNames.contains(e.fullName)) {
+                              uniqueFullNames.add(e.fullName);
+                              return e;
+                            } else {
+                              return null;
+                            }
+                          })
+                          .whereType<AttendanceRaw>()
+                          .toList();
+
+                  groupedEntries[key] = accurateAttendanceList;
 
                   // get the remaining students who were absent
                   List<IndivStudent> absentStudents =
@@ -410,7 +435,7 @@ class AnalyticsPage extends ConsumerWidget {
                     ),
                     Table(
                         columnWidths: const {
-                          0: FixedColumnWidth(40),
+                          0: FixedColumnWidth(50),
                           1: FlexColumnWidth(),
                           2: FixedColumnWidth(70),
                           3: FixedColumnWidth(65),
@@ -492,6 +517,7 @@ class AnalyticsPage extends ConsumerWidget {
                                   style: const TextStyle(
                                       fontFamily: "Roboto",
                                       fontWeight: FontWeight.w500),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                               Padding(
@@ -512,6 +538,7 @@ class AnalyticsPage extends ConsumerWidget {
                                   style: const TextStyle(
                                       fontFamily: "Roboto",
                                       fontWeight: FontWeight.w500),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                               Padding(
@@ -522,6 +549,7 @@ class AnalyticsPage extends ConsumerWidget {
                                   style: const TextStyle(
                                       fontFamily: "Roboto",
                                       fontWeight: FontWeight.w500),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                               Padding(
@@ -532,6 +560,7 @@ class AnalyticsPage extends ConsumerWidget {
                                   style: const TextStyle(
                                       fontFamily: "Roboto",
                                       fontWeight: FontWeight.w500),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ])
@@ -555,5 +584,10 @@ class AnalyticsPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String getDayName(DateTime date) {
+    return DateFormat('EEEE')
+        .format(date); // Returns full day name (e.g., Monday)
   }
 }

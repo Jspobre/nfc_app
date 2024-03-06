@@ -136,26 +136,40 @@ class AttendanceSection extends ConsumerWidget {
 
                 // Filter the attendance data with the filters & selected date
                 // this results to students who are present and late at the selected sched
+                List<String> uniqueFullNames = [];
                 List<AttendanceRaw> filteredAttendance = attendanceList.when(
                   data: (data) {
-                    return data.where((element) {
-                      print(element.fullName);
-                      return selectedFilters['course'] == element.course &&
-                          selectedFilters['block'] == element.block &&
-                          selectedFilters['yearLevel'] == element.yearLevel &&
-                          selectedFilters['subject'] == element.subjectId &&
-                          selectedFilters['sched'] == element.scheduleId &&
-                          (selectedFilters['gender'] == element.gender ||
-                              selectedFilters['gender'] == 'All');
-                    }).where((element) {
-                      print('data datetime:');
-                      print(element.datetime);
-                      print('selected month');
-                      print(selectedMonth);
-                      return element.datetime.day == selectedMonth.day &&
-                          element.datetime.year == selectedMonth.year &&
-                          element.datetime.month == selectedMonth.month;
-                    }).toList();
+                    return data
+                        .where((element) {
+                          print(element.fullName);
+                          return selectedFilters['course'] == element.course &&
+                              selectedFilters['block'] == element.block &&
+                              selectedFilters['yearLevel'] ==
+                                  element.yearLevel &&
+                              selectedFilters['subject'] == element.subjectId &&
+                              selectedFilters['sched'] == element.scheduleId &&
+                              (selectedFilters['gender'] == element.gender ||
+                                  selectedFilters['gender'] == 'All');
+                        })
+                        .where((element) {
+                          print('data datetime:');
+                          print(element.datetime);
+                          print('selected month');
+                          print(selectedMonth);
+                          return element.datetime.day == selectedMonth.day &&
+                              element.datetime.year == selectedMonth.year &&
+                              element.datetime.month == selectedMonth.month;
+                        })
+                        .map((e) {
+                          if (!uniqueFullNames.contains(e.fullName)) {
+                            uniqueFullNames.add(e.fullName);
+                            return e;
+                          } else {
+                            return null;
+                          }
+                        })
+                        .whereType<AttendanceRaw>()
+                        .toList();
                   },
                   error: (error, stackTrace) => [],
                   loading: () => [],
@@ -370,7 +384,7 @@ class AttendanceSection extends ConsumerWidget {
 
                     Table(
                         columnWidths: const {
-                          0: FixedColumnWidth(40),
+                          0: FixedColumnWidth(50),
                           1: FlexColumnWidth(),
                           2: FixedColumnWidth(65.0),
                           3: FixedColumnWidth(100.0),
@@ -486,6 +500,7 @@ class AttendanceSection extends ConsumerWidget {
                                   style: const TextStyle(
                                       fontFamily: "Roboto",
                                       fontWeight: FontWeight.w500),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                               Padding(
@@ -533,6 +548,7 @@ class AttendanceSection extends ConsumerWidget {
                                   style: const TextStyle(
                                       fontFamily: "Roboto",
                                       fontWeight: FontWeight.w500),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ]),
@@ -574,42 +590,42 @@ class AttendanceSection extends ConsumerWidget {
                     //           .then((value) {
                     //         print('success');
                     //       });
-                    //       await dbService
-                    //           .insertAttendance(
-                    //               '2',
-                    //               1,
-                    //               selectedMonth.microsecondsSinceEpoch,
-                    //               'Present')
-                    //           .then((value) {
-                    //         print('success');
-                    //       });
-                    //       await dbService
-                    //           .insertAttendance(
-                    //               '3',
-                    //               1,
-                    //               selectedMonth.microsecondsSinceEpoch,
-                    //               'Present')
-                    //           .then((value) {
-                    //         print('success');
-                    //       });
-                    //       await dbService
-                    //           .insertAttendance(
-                    //               '4',
-                    //               1,
-                    //               selectedMonth.microsecondsSinceEpoch,
-                    //               'Present')
-                    //           .then((value) {
-                    //         print('success');
-                    //       });
-                    //       await dbService
-                    //           .insertAttendance(
-                    //               '5',
-                    //               1,
-                    //               selectedMonth.microsecondsSinceEpoch,
-                    //               'Present')
-                    //           .then((value) {
-                    //         print('success');
-                    //       });
+                    //       // await dbService
+                    //       //     .insertAttendance(
+                    //       //         '2',
+                    //       //         1,
+                    //       //         selectedMonth.microsecondsSinceEpoch,
+                    //       //         'Present')
+                    //       //     .then((value) {
+                    //       //   print('success');
+                    //       // });
+                    //       // await dbService
+                    //       //     .insertAttendance(
+                    //       //         '3',
+                    //       //         1,
+                    //       //         selectedMonth.microsecondsSinceEpoch,
+                    //       //         'Present')
+                    //       //     .then((value) {
+                    //       //   print('success');
+                    //       // });
+                    //       // await dbService
+                    //       //     .insertAttendance(
+                    //       //         '4',
+                    //       //         1,
+                    //       //         selectedMonth.microsecondsSinceEpoch,
+                    //       //         'Present')
+                    //       //     .then((value) {
+                    //       //   print('success');
+                    //       // });
+                    //       // await dbService
+                    //       //     .insertAttendance(
+                    //       //         '5',
+                    //       //         1,
+                    //       //         selectedMonth.microsecondsSinceEpoch,
+                    //       //         'Present')
+                    //       //     .then((value) {
+                    //       //   print('success');
+                    //       // });
                     //       // await dbService
                     //       //     .insertAttendance(
                     //       //         '2021',
