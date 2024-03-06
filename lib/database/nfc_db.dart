@@ -42,7 +42,7 @@ class NfcDB {
       FOREIGN KEY (subject_id) REFERENCES $subjectsTable (subject_id)
     );""");
 
-    await database.execute("""CREATE TABLE IF NOT EXISTS $attendanceTable (
+    await database.execute("""CREATE TABLE IF NOT EXISTS $attendanceTable ( 
       attendance_id INTEGER PRIMARY KEY AUTOINCREMENT,
       student_num TEXT,
       schedule_id INTEGER,

@@ -88,7 +88,7 @@ class _HomeState extends State<Home> {
           });
 
           // Start scanning when a detail is tapped
-          startScanning(scheduleId);
+          startScanning(scheduleId, startTime);
 
           // Show the scan modal
           showBarModalBottomSheet(
@@ -102,7 +102,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Future<void> startScanning(int scheduleId) async {
+  Future<void> startScanning(int scheduleId, String startTime) async {
     while (true) {
       try {
         NFCTag tag = await FlutterNfcKit.poll();
@@ -136,7 +136,7 @@ class _HomeState extends State<Home> {
                   ''; // Use the null-aware operator to handle null values
             }
           }
-          showDetailsContainer(tag, textContent, scheduleId);
+          showDetailsContainer(tag, textContent, scheduleId, startTime);
           setState(() {
             _result = ' $textContent';
           });
@@ -156,7 +156,11 @@ class _HomeState extends State<Home> {
   }
 
   void showDetailsContainer(
-      NFCTag tag, String scannedData, int scheduleId) async {
+    NFCTag tag,
+    String scannedData,
+    int scheduleId,
+    String startTime,
+  ) async {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
 
@@ -210,21 +214,75 @@ class _HomeState extends State<Home> {
       );
 
       DatabaseService databaseService = DatabaseService();
+      // Fetch late time from the database
+      int lateTimeMinutes = await databaseService.fetchLateTimeLimit();
+
+      // Convert start time to DateTime
+      DateTime startTimeDateTime = _convertToDateTime(startTime);
+
+      // Calculate late time if late time is available
+      DateTime? lateTime;
+      if (lateTimeMinutes != null) {
+        lateTime = startTimeDateTime.add(Duration(minutes: lateTimeMinutes));
+      }
+
+      // Get current date
+      DateTime currentDate = DateTime.now();
+      // Get start and end of the day for current date
+      DateTime startOfDay =
+          DateTime(currentDate.year, currentDate.month, currentDate.day);
+      DateTime endOfDay = DateTime(
+          currentDate.year, currentDate.month, currentDate.day, 23, 59, 59);
+
+      List<Map<String, dynamic>> existingAttendances = await databaseService
+          .getAttendancesForScheduleAndDate(scheduleId, currentDate);
+
+      bool tagAlreadyExists = await databaseService.checkAttendanceExists(
+          studentNum, scheduleId, currentDate);
+
+// If scanned tag content already exists for the current day, skip insertion
+      if (tagAlreadyExists) {
+        print(
+            'Attendance data already exists for Student Num: $studentNum, Schedule ID: $scheduleId');
+        return;
+      }
+      // Check if scanned tag content already exists for the current day
+
+      String status;
+      // If late time is available and current time is after late time, set status as "Late"
+      if (lateTime != null && currentDate.isAfter(lateTime)) {
+        status = 'Late';
+      } else {
+        status = 'Present';
+      }
+
       // Insert attendance data into the database
       await databaseService.insertAttendance(
         studentNum,
         scheduleId,
-        DateTime.now().millisecondsSinceEpoch,
-        'Present',
+        currentDate.microsecondsSinceEpoch,
+        status,
       );
 
       // Print the inserted data
       print('Attendance data inserted: '
           'Student Num: $studentNum, '
           'Schedule ID: $scheduleId, '
-          'Datetime: ${DateTime.now().millisecondsSinceEpoch}, '
-          'Status: Present');
+          'Datetime: ${currentDate.microsecondsSinceEpoch}, '
+          'Status: $status');
     }
+  }
+
+  DateTime _convertToDateTime(String time) {
+    // Assuming the time format is always like '4:30PM'
+    List<String> timeParts = time.split(':');
+    int hour = int.parse(timeParts[0]);
+    int minute = int.parse(timeParts[1].substring(0, 2));
+    if (timeParts[1].contains('PM')) {
+      hour += 12;
+    }
+    return DateTime(DateTime.now().year, DateTime.now().month,
+        DateTime.now().day, hour, minute);
   }
 
   Future<bool> checkIfDataExists(String scannedData) async {
