@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 import 'package:nfc_app/widgets/textfield%20container/textfieldContainer.dart';
@@ -49,12 +50,24 @@ class _AddScheduleState extends State<AddSchedule> {
 
       // Insert the schedule into the database
       DatabaseService databaseService = DatabaseService();
-      await databaseService.insertSched(
-        int.parse(selectedCourse!.split('-').last.trim()),
-        selectedDay!,
-        startTime,
-        endTime,
-      );
+      late var result;
+      try {
+        await databaseService
+            .insertSched(
+              int.parse(selectedCourse!.split('-').last.trim()),
+              selectedDay!,
+              startTime,
+              endTime,
+            )
+            .then((value) => result = value);
+      } catch (e) {
+        print(e);
+        Fluttertoast.showToast(
+          msg: 'Error inserting schedule: $e',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+        );
+      }
 
       // Fetch all schedules from the database
       List<Map<String, dynamic>> schedules =
@@ -70,12 +83,22 @@ class _AddScheduleState extends State<AddSchedule> {
         print('---------------');
       });
 
-      // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Schedule added successfully'),
-        ),
-      );
+      if (result == -1) {
+        // Show a failed message
+        Fluttertoast.showToast(
+          msg: 'Schedule already exist!',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+        );
+      } else {
+        // Show a success message
+
+        Fluttertoast.showToast(
+          msg: 'Schedule added successfully!',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+        );
+      }
 
       // Reset the selected values
       setState(() {
@@ -86,10 +109,11 @@ class _AddScheduleState extends State<AddSchedule> {
       });
     } else {
       // Show an error message if any required field is missing
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please fill all fields'),
-        ),
+
+      Fluttertoast.showToast(
+        msg: 'Please fill all fields',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
       );
     }
   }
@@ -255,7 +279,7 @@ class _AddScheduleState extends State<AddSchedule> {
                           },
                           icon:
                               Icon(Icons.date_range), // Add the date icon here
-                          label: Text('Select Start Time'),
+                          label: Text('Start Time'),
                           style: ButtonStyle(
                             backgroundColor:
                                 MaterialStateProperty.resolveWith<Color>(
@@ -292,7 +316,7 @@ class _AddScheduleState extends State<AddSchedule> {
                           },
                           icon:
                               Icon(Icons.date_range), // Add the date icon here
-                          label: Text('Select End Time'),
+                          label: Text('End Time'),
                           style: ButtonStyle(
                             backgroundColor:
                                 MaterialStateProperty.resolveWith<Color>(

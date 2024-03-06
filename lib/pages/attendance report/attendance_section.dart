@@ -567,7 +567,7 @@ class AttendanceSection extends ConsumerWidget {
                     //       // print(schedId);
                     //       await dbService
                     //           .insertAttendance(
-                    //               '2020-8180-91224',
+                    //               '1',
                     //               1,
                     //               selectedMonth.microsecondsSinceEpoch,
                     //               'Present')
@@ -576,7 +576,34 @@ class AttendanceSection extends ConsumerWidget {
                     //       });
                     //       await dbService
                     //           .insertAttendance(
-                    //               '2020',
+                    //               '2',
+                    //               1,
+                    //               selectedMonth.microsecondsSinceEpoch,
+                    //               'Present')
+                    //           .then((value) {
+                    //         print('success');
+                    //       });
+                    //       await dbService
+                    //           .insertAttendance(
+                    //               '3',
+                    //               1,
+                    //               selectedMonth.microsecondsSinceEpoch,
+                    //               'Present')
+                    //           .then((value) {
+                    //         print('success');
+                    //       });
+                    //       await dbService
+                    //           .insertAttendance(
+                    //               '4',
+                    //               1,
+                    //               selectedMonth.microsecondsSinceEpoch,
+                    //               'Present')
+                    //           .then((value) {
+                    //         print('success');
+                    //       });
+                    //       await dbService
+                    //           .insertAttendance(
+                    //               '5',
                     //               1,
                     //               selectedMonth.microsecondsSinceEpoch,
                     //               'Present')

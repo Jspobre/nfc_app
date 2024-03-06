@@ -71,12 +71,30 @@ class _AddStudentState extends State<AddStudent> {
       print('Error inserting student: $error');
 
       // Display error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error inserting student: $error'),
-        ),
-      );
+      if (error.toString() == 'Student already exists') {
+        Fluttertoast.showToast(
+          msg: 'Student already exists!',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+        );
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Error inserting student: $error',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+        );
+      }
     }
+
+    // Reset selected values
+    setState(() {
+      studentNumController.clear();
+      studentNameController.clear();
+      selectedGender = null;
+      selectedCourse = null;
+      selectedYearLevel = null;
+      selectedBlock = null;
+    });
   }
 
   @override

@@ -25,20 +25,42 @@ class _AddSubjectState extends State<AddSubject> {
     print('Subject name: $subjectName');
     print('Crouse name: $courseName');
 
-    // Perform validation if needed
+    late var result;
 
-    // Insert the subject into the database
-    await DatabaseService().insertSubject(subjectName, courseName);
+    try {
+      // Insert the subject into the database
+      await DatabaseService()
+          .insertSubject(subjectName, courseName)
+          .then((value) => result = value);
+    } catch (e) {
+      print(e);
+      Fluttertoast.showToast(
+        msg: 'Error inserting subject: $e',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+      );
+    }
 
-    // Show a toast or message to indicate successful submission
-    Fluttertoast.showToast(
-      msg: 'Subject: $subjectName added! Course: $courseName added!',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-    );
+    if (result == -1) {
+      // Show a toast or message to indicate failed submission
+      Fluttertoast.showToast(
+        msg: 'Subject and course already exist!',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+      );
+    } else {
+      // Show a toast or message to indicate successful submission
+      Fluttertoast.showToast(
+        msg: 'Subject: $subjectName added! Course: $courseName added!',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+      );
+    }
 
     // Clear the text field after submission
-    _subjectController.clear();
+    setState(() {
+      _subjectController.clear();
+    });
   }
 
   @override
@@ -113,6 +135,9 @@ class _AddSubjectState extends State<AddSubject> {
                   controller: _subjectController,
                   hintText: 'Enter subject name',
                 ),
+              ),
+              SizedBox(
+                height: 10,
               ),
               TextFieldContainer(
                 label: "Course",
