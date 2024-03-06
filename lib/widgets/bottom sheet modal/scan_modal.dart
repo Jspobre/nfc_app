@@ -21,7 +21,7 @@ class ScanModal extends StatelessWidget {
                 details!,
                 style: TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.normal,
                 ),
               ),
             ),

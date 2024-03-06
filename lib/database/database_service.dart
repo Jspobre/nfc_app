@@ -303,32 +303,60 @@ class DatabaseService {
   }
 
   // insert Attendance
-  Future<void> insertLateTimeLimit(int timeLimit) async {
-    // Get a reference to the database
-    final db = await database;
-
-    // Insert the subject into the subjects table
+  Future<void> insertLateTimeLimit(int minutes) async {
+    final Database db = await database;
+    // Use the correct table name 'late_time' here
     await db.insert(
       'late_time',
-      {'minutes': timeLimit},
+      {'minutes': minutes},
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  // Fetch sched Details
   Future<int> fetchLateTimeLimit() async {
     final Database db = await database;
     List<Map<String, dynamic>> results = await db.query('late_time');
-
     if (results.isNotEmpty) {
-      // Assuming there's only one row, you can retrieve the first row
-      // and extract the value of the 'minutes' column as an int.
       return results[0]['minutes'] as int;
     } else {
-      // Handle the case when there are no rows in the table or any other error case.
-      // You might want to return a default value or throw an exception, based on your requirement.
-      // For now, I'm returning 0 as a default value.
       return 0;
     }
+  }
+
+  Future<List<Map<String, dynamic>>> getAttendancesForScheduleAndDate(
+      int scheduleId, DateTime currentDate) async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> attendances = await db.rawQuery(
+      'SELECT * FROM attendance WHERE schedule_id = ? AND datetime >= ? AND datetime < ?',
+      [
+        scheduleId,
+        currentDate.microsecondsSinceEpoch,
+        currentDate.add(Duration(days: 1)).microsecondsSinceEpoch
+      ],
+    );
+    return attendances;
+  }
+
+  // Function for checking of attendance on a specific student and schedule id and the date
+  Future<bool> checkAttendanceExists(
+      String studentNum, int scheduleId, DateTime currentDate) async {
+    final Database db = await database;
+
+    // Calculate start and end of the current day
+    DateTime startOfDay =
+        DateTime(currentDate.year, currentDate.month, currentDate.day);
+    DateTime endOfDay = startOfDay.add(Duration(days: 1));
+
+    final List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT COUNT(*) AS count FROM attendance WHERE student_num = ? AND schedule_id = ? AND datetime >= ? AND datetime < ?',
+      [
+        studentNum,
+        scheduleId,
+        startOfDay.microsecondsSinceEpoch,
+        endOfDay.microsecondsSinceEpoch
+      ],
+    );
+    final int count = Sqflite.firstIntValue(result) ?? 0;
+    return count > 0;
   }
 }

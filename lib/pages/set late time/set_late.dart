@@ -15,6 +15,7 @@ class SetLateFormPage extends StatefulWidget {
 
 class _SetLateFormPageState extends State<SetLateFormPage> {
   final minutesController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,25 +91,29 @@ class _SetLateFormPageState extends State<SetLateFormPage> {
                   if (minutesController.text.isNotEmpty) {
                     final dbService = DatabaseService();
 
-                    dbService.insertLateTimeLimit(
-                        int.parse(minutesController.text.trim()));
-                    Fluttertoast.showToast(
-                      msg: 'Time Limit was set successfully!',
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                    );
+                    try {
+                      await dbService.insertLateTimeLimit(
+                          int.parse(minutesController.text));
 
-                    setState(() {
-                      minutesController.clear();
-                    });
+                      Fluttertoast.showToast(
+                        msg: 'Time Limit was set successfully!',
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                      );
 
-                    var result = await dbService
-                        .fetchLateTimeLimit(); // Wait for the future to complete
+                      setState(() {
+                        minutesController.clear();
+                      });
 
-                    print(result);
+                      var result = await dbService.fetchLateTimeLimit();
+                      print(result);
+                    } catch (e) {
+                      print('Error inserting data: $e');
+                    }
                   }
                 },
               ),
+
               SizedBox(height: 20), // Add additional spacing at the end
             ],
           ),
