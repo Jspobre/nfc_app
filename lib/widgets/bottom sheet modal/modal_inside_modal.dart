@@ -45,14 +45,23 @@ class ModalInsideModal extends StatelessWidget {
                       final String fullName = student['full_name'];
                       final String course = student['course'];
                       final String studentNum = student['student_num'];
+                      final String yearLevel = student['year_level'][0];
+                      final String block = student['block'];
 
                       return ListTile(
                         title: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(fullName),
-                            Text(
-                                '${course == "Bachelor of Science in Information Technology" ? "BSIT" : course == "Bachelor of Science in Computer Science" ? "BSCS" : course == "Bachelor of Science in Information System" ? "BSIS" : course == "Bachelor of Science in Electronics Engineering" ? "BSECE" : course == "Bachelor of Science in Computer Engineering" ? "BSCpE" : course == "Bachelor of Elementary Education" ? "BEEd" : course == "Bachelor of Secondary Education major in Math" ? "BSEd-Math" : course == "Bachelor of Secondary Education major in English" ? "BSEd-English" : course == "Bachelor of Technology and Livelihood Education major in ICT" ? "BTL-ICT" : course == "Bachelor of Technology and Livelihood Education major in HE" ? "BTL-HE" : course == "Bachelor of Science in Automotive Technology" ? "BSAT" : course == "Bachelor of Science in Electronics Technology" ? "BSEET" : course == "Bachelor of Science in Entrepreneurship" ? "BSEntrep" : course == "Bachelor of Science in Nursing" ? "BSN" : "Unknown abbreviation"}'),
+                            Row(
+                              children: [
+                                Text(
+                                    '${course == "Bachelor of Science in Information Technology" ? "BSIT" : course == "Bachelor of Science in Computer Science" ? "BSCS" : course == "Bachelor of Science in Information System" ? "BSIS" : course == "Bachelor of Science in Electronics Engineering" ? "BSECE" : course == "Bachelor of Science in Computer Engineering" ? "BSCpE" : course == "Bachelor of Elementary Education" ? "BEEd" : course == "Bachelor of Secondary Education major in Math" ? "BSEd-Math" : course == "Bachelor of Secondary Education major in English" ? "BSEd-English" : course == "Bachelor of Technology and Livelihood Education major in ICT" ? "BTL-ICT" : course == "Bachelor of Technology and Livelihood Education major in HE" ? "BTL-HE" : course == "Bachelor of Science in Automotive Technology" ? "BSAT" : course == "Bachelor of Science in Electronics Technology" ? "BSEET" : course == "Bachelor of Science in Entrepreneurship" ? "BSEntrep" : course == "Bachelor of Science in Nursing" ? "BSN" : "Unknown abbreviation"}'),
+                                SizedBox(width: 5),
+                                Text(yearLevel),
+                                Text(block)
+                              ],
+                            ),
                           ],
                         ),
                         onTap: () {

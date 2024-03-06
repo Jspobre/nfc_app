@@ -73,6 +73,18 @@ class DatabaseService {
     // Get a reference to the database
     final db = await database;
 
+    // Check if there's an existing entry with the same subjectName and courseName
+    List<Map<String, dynamic>> existingSubjects = await db.query(
+      'subjects',
+      where: 'subject_name = ? AND course_name = ?',
+      whereArgs: [subjectName, courseName],
+    );
+
+    // If there's an existing entry, return without inserting
+    if (existingSubjects.isNotEmpty) {
+      return -1; // You can choose a specific code to indicate that the entry already exists
+    }
+
     // Insert the subject into the subjects table
     return await db.insert(
       'subjects',
@@ -87,7 +99,19 @@ class DatabaseService {
     // Get a reference to the database
     final db = await database;
 
-    // Insert the subject into the subjects table
+    // Check if there's an existing entry with the same subjectId, day, startTime, and endTime
+    List<Map<String, dynamic>> existingSchedules = await db.query(
+      'schedules',
+      where: 'subject_id = ? AND day = ? AND start_time = ? AND end_time = ?',
+      whereArgs: [subjectId, day, startTime, endTime],
+    );
+
+    // If there's an existing entry, return without inserting
+    if (existingSchedules.isNotEmpty) {
+      return -1; // You can choose a specific code to indicate that the entry already exists
+    }
+
+    // Insert the schedule into the schedules table
     return await db.insert(
       'schedules',
       {
@@ -112,7 +136,19 @@ class DatabaseService {
     // Get a reference to the database
     final db = await database;
 
-    // Insert the subject into the subjects table
+    // Check if there's an existing entry with the same studentNum
+    List<Map<String, dynamic>> existingStudents = await db.query(
+      'students',
+      where: 'student_num = ?',
+      whereArgs: [studentNum],
+    );
+
+    // If there's an existing entry, return without inserting
+    if (existingStudents.isNotEmpty) {
+      throw Exception('Student already exists');
+    }
+
+    // Insert the student into the students table
     await db.insert(
       'students',
       {
@@ -132,7 +168,19 @@ class DatabaseService {
     // Get a reference to the database
     final db = await database;
 
-    // Insert the subject into the subjects table
+    // Check if there's an existing entry with the same studentNum and subjectId
+    List<Map<String, dynamic>> existingAssignments = await db.query(
+      'student_subjects',
+      where: 'student_num = ? AND subject_id = ?',
+      whereArgs: [studentNum, subjectId],
+    );
+
+    // If there's an existing entry, return without inserting
+    if (existingAssignments.isNotEmpty) {
+      throw Exception('Student was already assigned with the subject');
+    }
+
+    // Insert the assignment into the student_subjects table
     await db.insert(
       'student_subjects',
       {
