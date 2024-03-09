@@ -60,6 +60,7 @@ class _AddSubjectState extends State<AddSubject> {
     // Clear the text field after submission
     setState(() {
       _subjectController.clear();
+      selectedCourse = null;
     });
   }
 
