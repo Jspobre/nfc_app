@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nfc_app/pages/attendance%20report/analytics_page.dart';
 import 'package:nfc_app/pages/attendance%20report/attendance_section.dart';
 import 'package:nfc_app/provider/attendanceData_provider.dart';
+import 'package:nfc_app/provider/filterPage_provider.dart';
 
 class AttendanceReport extends ConsumerWidget {
   const AttendanceReport({super.key});
@@ -11,6 +12,9 @@ class AttendanceReport extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.refresh(attendanceDataProvider);
     ref.refresh(studentListProvider);
+    ref.refresh(courseSelectionProvider);
+    ref.refresh(subjectOptionsProvider);
+    ref.refresh(schedOptionsProvider);
     return DefaultTabController(
       length: 2,
       child: Scaffold(
