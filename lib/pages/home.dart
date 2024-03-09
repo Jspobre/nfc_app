@@ -240,17 +240,18 @@ class _HomeState extends State<Home> {
       bool tagAlreadyExists = await databaseService.checkAttendanceExists(
           studentNum, scheduleId, currentDate);
 
-// If scanned tag content already exists for the current day, skip insertion
+      // If scanned tag content already exists for the current day, skip insertion
       if (tagAlreadyExists) {
         print(
             'Attendance data already exists for Student Num: $studentNum, Schedule ID: $scheduleId');
         return;
       }
       // Check if scanned tag content already exists for the current day
-
       String status;
-      // If late time is available and current time is after late time, set status as "Late"
-      if (lateTime != null && currentDate.isAfter(lateTime)) {
+
+      if (lateTime != null &&
+          lateTimeMinutes > 0 &&
+          currentDate.isAfter(lateTime)) {
         status = 'Late';
       } else {
         status = 'Present';
@@ -270,17 +271,30 @@ class _HomeState extends State<Home> {
           'Schedule ID: $scheduleId, '
           'Datetime: ${currentDate.microsecondsSinceEpoch}, '
           'Status: $status');
+
+      print('Start Time: $startTimeDateTime');
+      print('Late Time: $lateTime');
+      print('Current Date: $currentDate');
     }
   }
 
   DateTime _convertToDateTime(String time) {
-    // Assuming the time format is always like '4:30PM'
-    List<String> timeParts = time.split(':');
+    // Split the time string by non-digit characters
+    List<String> timeParts = time.split(RegExp(r'[^\d]'));
+
+    // Extract hour and minute from timeParts
     int hour = int.parse(timeParts[0]);
-    int minute = int.parse(timeParts[1].substring(0, 2));
-    if (timeParts[1].contains('PM')) {
+    int minute = int.parse(timeParts[1]);
+
+    // Check if the time string contains 'PM' or 'pm'
+    bool isPM = time.toLowerCase().contains('pm');
+
+    // Adjust hour if it's PM and not in 24-hour format
+    if (isPM && hour < 12) {
       hour += 12;
     }
+
+    // Return a DateTime object representing the specified time
     return DateTime(DateTime.now().year, DateTime.now().month,
         DateTime.now().day, hour, minute);
   }
