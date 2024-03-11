@@ -399,9 +399,9 @@ class AttendanceSection extends ConsumerWidget {
                               children: [
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 4),
+                                      horizontal: 8, vertical: 4),
                                   child: Text(
-                                    '${mergedList.length}',
+                                    'No.',
                                     style: TextStyle(
                                         fontFamily: "Roboto",
                                         fontWeight: FontWeight.w500),
@@ -494,7 +494,7 @@ class AttendanceSection extends ConsumerWidget {
                             TableRow(children: [
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 4),
+                                    horizontal: 8, vertical: 4),
                                 child: Text(
                                   '${mergedList.indexOf(item) + 1}',
                                   style: const TextStyle(
@@ -505,7 +505,7 @@ class AttendanceSection extends ConsumerWidget {
                               ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 4),
+                                    horizontal: 4, vertical: 4),
                                 child: Text(
                                   item is AttendanceRaw &&
                                           (schedDay ==
@@ -553,93 +553,6 @@ class AttendanceSection extends ConsumerWidget {
                               ),
                             ]),
                         ]),
-                    // StyledButton(
-                    //     noShadow: true,
-                    //     btnIcon: Icon(Icons.picture_as_pdf),
-                    //     iconOnRight: true,
-                    //     btnText: "insert test data",
-                    //     onClick: () async {
-                    //       print('test insert');
-                    //       final dbService = DatabaseService();
-
-                    //       // final subjectId = await dbService.insertSubject(
-                    //       //     'Capstone',
-                    //       //     "Bachelor of Science in Computer Science");
-                    //       // final schedId = await dbService.insertSched(
-                    //       //     subjectId, "Sunday", "9AM", '12PM');
-                    //       // await dbService.insertStudent(
-                    //       //     '5',
-                    //       //     'Jonnel sheesh',
-                    //       //     'Male',
-                    //       //     'Bachelor of Science in Computer Science',
-                    //       //     "A",
-                    //       //     "1st Year");
-
-                    //       // await dbService.assignSubject('5', 1).then((value) {
-                    //       //   print('sheesh');
-                    //       // });
-
-                    //       // print(subjectId);
-                    //       // print(schedId);
-                    //       await dbService
-                    //           .insertAttendance(
-                    //               '1',
-                    //               1,
-                    //               selectedMonth.microsecondsSinceEpoch,
-                    //               'Present')
-                    //           .then((value) {
-                    //         print('success');
-                    //       });
-                    //       // await dbService
-                    //       //     .insertAttendance(
-                    //       //         '2',
-                    //       //         1,
-                    //       //         selectedMonth.microsecondsSinceEpoch,
-                    //       //         'Present')
-                    //       //     .then((value) {
-                    //       //   print('success');
-                    //       // });
-                    //       // await dbService
-                    //       //     .insertAttendance(
-                    //       //         '3',
-                    //       //         1,
-                    //       //         selectedMonth.microsecondsSinceEpoch,
-                    //       //         'Present')
-                    //       //     .then((value) {
-                    //       //   print('success');
-                    //       // });
-                    //       // await dbService
-                    //       //     .insertAttendance(
-                    //       //         '4',
-                    //       //         1,
-                    //       //         selectedMonth.microsecondsSinceEpoch,
-                    //       //         'Present')
-                    //       //     .then((value) {
-                    //       //   print('success');
-                    //       // });
-                    //       // await dbService
-                    //       //     .insertAttendance(
-                    //       //         '5',
-                    //       //         1,
-                    //       //         selectedMonth.microsecondsSinceEpoch,
-                    //       //         'Present')
-                    //       //     .then((value) {
-                    //       //   print('success');
-                    //       // });
-                    //       // await dbService
-                    //       //     .insertAttendance(
-                    //       //         '2021',
-                    //       //         1,
-                    //       //         selectedMonth.microsecondsSinceEpoch,
-                    //       //         'Present')
-                    //       //     .then((value) {
-                    //       //   print('success');
-                    //       // });
-                    //       // ignore: unused_result
-                    //       ref.refresh(studentListProvider);
-                    //       // ignore: unused_result
-                    //       ref.refresh(attendanceDataProvider);
-                    //     }),
                   ],
                 );
               }),

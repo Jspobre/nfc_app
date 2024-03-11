@@ -134,7 +134,7 @@ class _EnrollStudentState extends State<EnrollStudent> {
                       height: 5,
                     ),
                     Text(
-                      "Automated Attendance Monitoring and Tracking System using NFC Tags",
+                      "NFC - Enabled Class Attendance Monitoring with Data Analytics",
                       style: TextStyle(fontFamily: "Roboto"),
                       textAlign: TextAlign.center,
                     ),
