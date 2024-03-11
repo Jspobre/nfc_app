@@ -61,7 +61,13 @@ class AttendancePdf {
                   context: context,
                   cellAlignment: Alignment.center,
                   data: const <List<String>>[
-                    <String>['No.', 'NAME', 'PRESENTS', 'ABSENTS', "LATES"],
+                    <String>[
+                      'No.',
+                      'NAME',
+                      'PRESENT (TOTAL)',
+                      'ABSENT (TOTAL)',
+                      "LATE (TOTAL)"
+                    ],
                   ],
                   columnWidths: {
                     0: FixedColumnWidth(40),

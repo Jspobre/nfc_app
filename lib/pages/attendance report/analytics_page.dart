@@ -412,9 +412,6 @@ class AnalyticsPage extends ConsumerWidget {
                         );
 
                         if (dateTimeRange != null) {
-                          // setState(() {
-                          //   selectedDates = dateTimeRange;
-                          // });
                           ref.read(selectedDateRangeProvider.notifier).state =
                               dateTimeRange;
                         }
@@ -434,13 +431,15 @@ class AnalyticsPage extends ConsumerWidget {
                       height: 10,
                     ),
                     Table(
+                        defaultVerticalAlignment:
+                            TableCellVerticalAlignment.middle,
                         columnWidths: const {
                           0: FixedColumnWidth(50),
                           1: FlexColumnWidth(),
-                          2: FixedColumnWidth(70),
-                          3: FixedColumnWidth(65),
+                          2: FixedColumnWidth(65),
+                          3: FixedColumnWidth(60),
                           // 3: FixedColumnWidth(120.0),
-                          4: FixedColumnWidth(50),
+                          4: FixedColumnWidth(55),
                         },
                         border: TableBorder
                             .all(), // Allows to add a border decoration around your table
@@ -452,9 +451,9 @@ class AnalyticsPage extends ConsumerWidget {
                               children: [
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 4),
+                                      horizontal: 8, vertical: 4),
                                   child: Text(
-                                    '${result.length}',
+                                    'No.',
                                     style: TextStyle(
                                         fontFamily: "Roboto",
                                         fontWeight: FontWeight.w500),
@@ -476,7 +475,7 @@ class AnalyticsPage extends ConsumerWidget {
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 4, vertical: 4),
                                   child: Text(
-                                    'Presents',
+                                    'Present (Total)',
                                     style: TextStyle(
                                         fontFamily: "Roboto",
                                         fontWeight: FontWeight.w500),
@@ -487,7 +486,7 @@ class AnalyticsPage extends ConsumerWidget {
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 4, vertical: 4),
                                   child: Text(
-                                    'Absents',
+                                    'Absent (Total)',
                                     style: TextStyle(
                                         fontFamily: "Roboto",
                                         fontWeight: FontWeight.w500),
@@ -496,9 +495,9 @@ class AnalyticsPage extends ConsumerWidget {
                                 ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 4, vertical: 4),
+                                      horizontal: 2, vertical: 4),
                                   child: Text(
-                                    'Lates',
+                                    'Late (Total)',
                                     style: TextStyle(
                                         fontFamily: "Roboto",
                                         fontWeight: FontWeight.w500),
@@ -511,7 +510,7 @@ class AnalyticsPage extends ConsumerWidget {
                             TableRow(children: [
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 4),
+                                    horizontal: 8, vertical: 4),
                                 child: Text(
                                   '${result.indexOf(student) + 1}',
                                   style: const TextStyle(
@@ -522,7 +521,7 @@ class AnalyticsPage extends ConsumerWidget {
                               ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 4),
+                                    horizontal: 8, vertical: 4),
                                 child: Text(
                                   student['fullName'],
                                   style: const TextStyle(
