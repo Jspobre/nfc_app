@@ -9,16 +9,18 @@ import 'package:nfc_app/provider/attendanceData_provider.dart';
 import 'package:nfc_app/provider/date_provider.dart';
 import 'package:nfc_app/provider/filterPage_provider.dart';
 import 'package:nfc_app/provider/schedDetail_provider.dart';
+import 'package:nfc_app/provider/sort_provider.dart';
 import 'package:nfc_app/provider/subjectName_provider.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 
 class AttendanceSection extends ConsumerWidget {
-  const AttendanceSection({super.key});
-
+  AttendanceSection({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // selected filters watch
     final selectedFilters = ref.watch(filterProvider);
+    // sort bool - sort alphabetically or by time arrived
+    final sortName = ref.watch(sortNameProvider);
 
     // course name to abbreviation converter
     String courseAbbreviation = (selectedFilters['course'] as String) ==
@@ -198,10 +200,17 @@ class AttendanceSection extends ConsumerWidget {
                 List<dynamic> mergedList = List.from(filteredAttendance)
                   ..addAll(absentStudents);
 
-                print("present students:");
-                print(filteredAttendance);
-                print("absent students:");
-                print(absentStudents);
+                // sort alphabetically if selected
+                if (sortName) {
+                  mergedList.sort((a, b) {
+                    return (a is AttendanceRaw
+                            ? a.fullName
+                            : (a as IndivStudent).fullName)
+                        .compareTo(b is AttendanceRaw
+                            ? b.fullName
+                            : (b as IndivStudent).fullName);
+                  });
+                }
                 return Column(
                   children: [
                     // ! SELECTED FILTER TITLE DISPLAY
@@ -302,6 +311,19 @@ class AttendanceSection extends ConsumerWidget {
                             }
                           },
                           icon: Icon(Icons.calendar_today_rounded),
+                        ),
+                        // ! SORT BUTTON
+                        IconButton(
+                          color: sortName ? Color(0xff16A637) : Colors.black87,
+                          onPressed: () {
+                            ref.read(sortNameProvider.notifier).state =
+                                !sortName;
+                            // ignore: unused_result
+                            ref.refresh(attendanceDataProvider);
+                            // ignore: unused_result
+                            ref.refresh(studentListProvider);
+                          },
+                          icon: Icon(Icons.sort_by_alpha_rounded),
                         ),
                         const SizedBox(
                           width: 10,
