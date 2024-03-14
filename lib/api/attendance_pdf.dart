@@ -134,7 +134,7 @@ class AttendancePdf {
                   data is AttendanceRaw
                       ? data.fullName
                       : (data as IndivStudent).fullName,
-                  '${data is AttendanceRaw ? data.status : 'Absent '}                 ${lastNumber.toString()}'
+                  '${data is AttendanceRaw ? data.status : 'Absent '}       ${data is AttendanceRaw ? (data.status == "Late" ? '    ' : '') : ''}          ${lastNumber.toString()}'
                 ]);
               }
 

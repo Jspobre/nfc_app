@@ -8,6 +8,7 @@ import 'package:nfc_app/provider/attendanceData_provider.dart';
 import 'package:nfc_app/provider/date_provider.dart';
 import 'package:nfc_app/provider/filterPage_provider.dart';
 import 'package:nfc_app/provider/schedDetail_provider.dart';
+import 'package:nfc_app/provider/sort_provider.dart';
 import 'package:nfc_app/provider/subjectName_provider.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
 
@@ -18,6 +19,8 @@ class AnalyticsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // selected filters watch
     final selectedFilters = ref.watch(filterProvider);
+    // sort bool - sort alphabetically or by time arrived
+    final sortName = ref.watch(sortNameProvider);
 
     // course name to abbreviation converter
     String courseAbbreviation = (selectedFilters['course'] as String) ==
@@ -289,6 +292,14 @@ class AnalyticsPage extends ConsumerWidget {
 
                 List<Map<String, dynamic>> result = mergedData.values.toList();
 
+                // sort alphabetically if selected
+                if (sortName) {
+                  result.sort((a, b) {
+                    return (a['fullName'] as String)
+                        .compareTo((b['fullName'] as String));
+                  });
+                }
+
                 return Column(
                   children: [
                     // ! SELECTED FILTER
@@ -371,6 +382,19 @@ class AnalyticsPage extends ConsumerWidget {
                             }
                           },
                           icon: Icon(Icons.date_range),
+                        ),
+                        // ! SORT BUTTON
+                        IconButton(
+                          color: sortName ? Color(0xff16A637) : Colors.black87,
+                          onPressed: () {
+                            ref.read(sortNameProvider.notifier).state =
+                                !sortName;
+                            // ignore: unused_result
+                            ref.refresh(attendanceDataProvider);
+                            // ignore: unused_result
+                            ref.refresh(studentListProvider);
+                          },
+                          icon: Icon(Icons.sort_by_alpha_rounded),
                         ),
                         const SizedBox(
                           width: 10,
