@@ -378,7 +378,7 @@ class FilterPage extends ConsumerWidget {
                 ),
                 //! Gender SELECTOR
                 Text(
-                  "Gender:".toUpperCase(),
+                  "Sex:".toUpperCase(),
                   style: const TextStyle(
                     fontFamily: "Roboto",
                     fontSize: 16,
@@ -399,7 +399,7 @@ class FilterPage extends ConsumerWidget {
                       DropdownMenuItem<String>(
                         value: "All",
                         child: Text(
-                          "All",
+                          "Intersex",
                           style: TextStyle(
                               fontFamily: "Roboto",
                               fontSize: 14,

@@ -54,7 +54,7 @@ dependencies:
   crypto: ^3.0.3
   sqflite: ^2.3.2
   flutter_riverpod: ^2.4.10
-  
+  fl_chart: ^0.66.2
 
 dev_dependencies:
   flutter_test:

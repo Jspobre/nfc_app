@@ -14,12 +14,17 @@ class AttendancePdf {
       String formattedDate,
       bool isAnalytics,
       String? courseBlockSubject,
-      String? schedDetail) async {
+      String? schedDetail,
+      int? totalAttendanceValue) async {
     final pdf = Document();
 
     final buLogo = MemoryImage(
       (await rootBundle.load('lib/images/logo_1.png')).buffer.asUint8List(),
     );
+
+    double calculatePercentage(double value, double totalValue) {
+      return (value / totalValue) * 100;
+    }
 
     if (isAnalytics && courseBlockSubject != null && schedDetail != null) {
       pdf.addPage(
@@ -46,8 +51,12 @@ class AttendancePdf {
                   lastNumber.toString(),
                   data['fullName'].toString(),
                   data['presents'].toString(),
+                  // '${(data['presents'] / totalAttendanceValue) * 100}%',
+                  '${calculatePercentage((data['presents'] as int).toDouble(), totalAttendanceValue!.toDouble()).toInt()}%',
                   data['absents'].toString(),
-                  data['lates'].toString()
+                  '${calculatePercentage((data['absents'] as int).toDouble(), totalAttendanceValue!.toDouble()).toInt()}%',
+                  data['lates'].toString(),
+                  '${calculatePercentage((data['lates'] as int).toDouble(), totalAttendanceValue!.toDouble()).toInt()}%'
                 ]);
               }
 
@@ -65,17 +74,23 @@ class AttendancePdf {
                       'No.',
                       'NAME',
                       'PRESENT (TOTAL)',
+                      '%',
                       'ABSENT (TOTAL)',
-                      "LATE (TOTAL)"
+                      '%',
+                      "LATE (TOTAL)",
+                      '%'
                     ],
                   ],
                   columnWidths: {
-                    0: FixedColumnWidth(40),
+                    0: FixedColumnWidth(35),
                     1: FlexColumnWidth(),
-                    2: FixedColumnWidth(70),
-                    3: FixedColumnWidth(65),
-                    // 3: FixedColumnWidth(120.0),
+                    2: FixedColumnWidth(60),
+                    3: FixedColumnWidth(50),
                     4: FixedColumnWidth(50),
+                    5: FixedColumnWidth(50),
+                    // 3: FixedColumnWidth(120.0),
+                    6: FixedColumnWidth(48),
+                    7: FixedColumnWidth(50),
                   },
                 ),
                 TableHelper.fromTextArray(
@@ -90,14 +105,20 @@ class AttendancePdf {
                     2: Alignment.center,
                     3: Alignment.center,
                     4: Alignment.center,
+                    5: Alignment.center,
+                    6: Alignment.center,
+                    7: Alignment.center,
                   },
                   data: tableData,
                   columnWidths: {
-                    0: FixedColumnWidth(40),
+                    0: FixedColumnWidth(35),
                     1: FlexColumnWidth(),
-                    2: FixedColumnWidth(70),
-                    3: FixedColumnWidth(65),
+                    2: FixedColumnWidth(60),
+                    3: FixedColumnWidth(50),
                     4: FixedColumnWidth(50),
+                    5: FixedColumnWidth(50),
+                    6: FixedColumnWidth(48),
+                    7: FixedColumnWidth(50),
                   },
                   headerStyle:
                       TextStyle(fontWeight: FontWeight.normal, fontSize: 11),
