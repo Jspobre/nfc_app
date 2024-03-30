@@ -14,7 +14,7 @@ class EnrollStudent extends StatefulWidget {
 class _EnrollStudentState extends State<EnrollStudent> {
   List<Map<String, dynamic>> subjects = [];
   List<Map<String, dynamic>> students = [];
-
+Set<String> selectedStudents = Set<String>(); // Define selectedStudents
   int? selectedCourse;
   String? selectedStudent;
 
@@ -43,39 +43,39 @@ class _EnrollStudentState extends State<EnrollStudent> {
     });
   }
 
-  Future<void> enrollStudent() async {
-    DatabaseService databaseService = DatabaseService();
-    final subjectId = selectedCourse ?? 0;
-    final studentNumber = selectedStudent ?? '';
+Future<void> enrollStudent() async {
+  DatabaseService databaseService = DatabaseService();
+  final subjectId = selectedCourse ?? 0;
+  final studentNumber = selectedStudent ?? '';
 
-    try {
-      await databaseService.assignSubject(studentNumber, subjectId);
+  try {
+    await databaseService.assignSubject(studentNumber, subjectId);
 
-      print("Student number: $studentNumber");
-      print("Subject ID: $subjectId");
-      // Show toast message
+    print("Student number: $studentNumber");
+    print("Subject ID: $subjectId");
+    // Show toast message
 
-      Fluttertoast.showToast(
-        msg: 'Student successfully enrolled!',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
+    Fluttertoast.showToast(
+      msg: 'Student successfully enrolled!',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+    );
 
-      // Clear selected values
-      setState(() {
-        selectedCourse = null;
-        selectedStudent = null;
-      });
-    } catch (error) {
-      print("Error enrolling student: $error");
-      Fluttertoast.showToast(
-        msg: 'Error enrolling student: $error',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
-    }
+    // Clear selected values
+    setState(() {
+      selectedCourse = null;
+      selectedStudent = null;
+      selectedStudents.clear(); // Clear selected students
+    });
+  } catch (error) {
+    print("Error enrolling student: $error");
+    Fluttertoast.showToast(
+      msg: 'Error enrolling student: $error',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+    );
   }
-
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,7 +143,7 @@ class _EnrollStudentState extends State<EnrollStudent> {
               ),
               const SizedBox(height: 10),
               TextFieldContainer(
-                label: "Subject and Course",
+                label: "Course and Academic Program",
                 inputWidget: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -188,7 +188,7 @@ class _EnrollStudentState extends State<EnrollStudent> {
                 ),
               ),
               const SizedBox(height: 10),
-              TextFieldContainer(
+                          TextFieldContainer(
                 label: "Student lists",
                 inputWidget: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,24 +196,27 @@ class _EnrollStudentState extends State<EnrollStudent> {
                     subjects.isEmpty
                         ? CircularProgressIndicator()
                         : subjects.isNotEmpty
-                            ? SizedBox(
-                                child: DropdownButton<String>(
-                                  isExpanded: true,
-                                  value: selectedStudent,
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      selectedStudent = newValue;
-                                    });
-                                  },
-                                  items: students
-                                      .where((student) =>
-                                          student['student_num'] != null)
-                                      .map((student) {
-                                    final studentName = student['full_name'] ??
-                                        'Unknown Course';
-                                    return DropdownMenuItem<String>(
-                                      value: '${student['student_num']}',
-                                      child: Text(
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: students
+                                    .where((student) => student['student_num'] != null)
+                                    .map((student) {
+                                  final studentName = student['full_name'] ?? 'Unknown Course';
+                                  return Row(
+                                    children: [
+                                      Checkbox(
+                                        value: selectedStudents.contains(student['student_num']),
+                                        onChanged: (bool? newValue) {
+                                          setState(() {
+                                            if (newValue!) {
+                                              selectedStudents.add(student['student_num']);
+                                            } else {
+                                              selectedStudents.remove(student['student_num']);
+                                            }
+                                          });
+                                        },
+                                      ),
+                                      Text(
                                         '${student['student_num']} - ${student['full_name']}',
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
@@ -223,23 +226,23 @@ class _EnrollStudentState extends State<EnrollStudent> {
                                           fontSize: 14,
                                         ),
                                       ),
-                                    );
-                                  }).toList(),
-                                ),
+                                    ],
+                                  );
+                                }).toList(),
                               )
                             : Text(
                                 'No subjects available',
                                 style: TextStyle(color: Colors.red),
                               ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20), // Adjust spacing as needed
-              StyledButton(
-                btnText: 'Enroll',
-                onClick: () {
-                  enrollStudent();
-                },
+                              ],
+                            ),
+                          ),
+                    SizedBox(height: 20), // Adjust spacing as needed
+                    StyledButton(
+                      btnText: 'Enroll',
+                      onClick: () {
+                        enrollStudent();
+                    },
               ),
               SizedBox(height: 20), // Add additional spacing at the end
             ],

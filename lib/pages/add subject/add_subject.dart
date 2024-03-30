@@ -69,7 +69,7 @@ class _AddSubjectState extends State<AddSubject> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Add Subject",
+          "Add Course",
           style: TextStyle(fontFamily: "Roboto", fontSize: 18),
         ),
         centerTitle: true,
@@ -115,7 +115,7 @@ class _AddSubjectState extends State<AddSubject> {
                 child: Column(
                   children: [
                     Text(
-                      "Subject form",
+                      "Course form",
                       style: TextStyle(fontFamily: "Roboto", fontSize: 24),
                     ),
                     SizedBox(
@@ -131,17 +131,17 @@ class _AddSubjectState extends State<AddSubject> {
               ),
               SizedBox(height: 10), // Adjust spacing as needed
               TextFieldContainer(
-                label: 'Subject Name',
+                label: 'Course',
                 inputWidget: StyledTextFormField(
                   controller: _subjectController,
-                  hintText: 'Enter subject name',
+                  hintText: 'Enter course name',
                 ),
               ),
               SizedBox(
                 height: 10,
               ),
               TextFieldContainer(
-                label: "Course",
+                label: "Academic Program",
                 inputWidget: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

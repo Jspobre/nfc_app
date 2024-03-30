@@ -185,7 +185,7 @@ class _AddScheduleState extends State<AddSchedule> {
               ),
               SizedBox(height: 10),
               TextFieldContainer(
-                label: "Subject and Course",
+                label: "Course and Academic Program",
                 inputWidget: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

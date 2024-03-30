@@ -336,7 +336,7 @@ class _HomeState extends State<Home> {
                 const PopupMenuItem<String>(
                   value: 'addsubject',
                   child: Text(
-                    'Add Subject',
+                    'Add Course',
                     style: TextStyle(fontFamily: "Roboto"),
                   ),
                 ),

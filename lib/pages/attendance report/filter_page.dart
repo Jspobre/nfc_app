@@ -80,7 +80,7 @@ class FilterPage extends ConsumerWidget {
               children: [
                 // ! COURSE SELECTER
                 Text(
-                  "Course:".toUpperCase(),
+                  "Academic Program:".toUpperCase(),
                   style: const TextStyle(
                     fontFamily: "Roboto",
                     fontSize: 16,
@@ -104,7 +104,7 @@ class FilterPage extends ConsumerWidget {
                         enabled: false,
                         value: '',
                         child: Text(
-                          'Select Course',
+                          'Select academic program',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                           style: TextStyle(
@@ -266,7 +266,7 @@ class FilterPage extends ConsumerWidget {
                 ),
                 //! SUBJECT SELECTOR
                 Text(
-                  "Subject:".toUpperCase(),
+                  "Course:".toUpperCase(),
                   style: const TextStyle(
                     fontFamily: "Roboto",
                     fontSize: 16,
@@ -289,7 +289,7 @@ class FilterPage extends ConsumerWidget {
                         enabled: false,
                         value: 0,
                         child: Text(
-                          'Select subject',
+                          'Select course',
                           style: const TextStyle(
                             fontFamily: "Roboto",
                             fontSize: 14,

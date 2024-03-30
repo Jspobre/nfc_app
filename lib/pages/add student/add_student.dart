@@ -203,7 +203,7 @@ class _AddStudentState extends State<AddStudent> {
                                 height: 16,
                               ),
                               TextFieldContainer(
-                                label: "Gender",
+                                label: "Sex",
                                 inputWidget: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -241,6 +241,23 @@ class _AddStudentState extends State<AddStudent> {
                                       },
                                       activeColor: Color(0xff16A637),
                                     ),
+                                          RadioListTile<String>(
+                                      title: const Text(
+                                        'Intersex',
+                                        style: TextStyle(
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      value: 'Intersex',
+                                      groupValue: selectedGender,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selectedGender = value!;
+                                          showErrorTextIrreg = false;
+                                        });
+                                      },
+                                      activeColor: Color(0xff16A637),
+                                    ),
                                     showErrorTextIrreg == true
                                         ? Text(
                                             errorText,
@@ -257,7 +274,7 @@ class _AddStudentState extends State<AddStudent> {
                                 height: 16,
                               ),
                               TextFieldContainer(
-                                label: "Course",
+                                label: "Academic Program",
                                 inputWidget: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
