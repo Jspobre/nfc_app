@@ -255,6 +255,7 @@ class AttendanceSection extends ConsumerWidget {
                                   formattedDate,
                                   false,
                                   null,
+                                  null,
                                   null); //! Pass the data
                             } catch (e) {
                               print("error generating pdf: $e");

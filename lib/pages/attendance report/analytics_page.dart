@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:nfc_app/api/attendance_pdf.dart';
 import 'package:nfc_app/model/fetch_data.dart';
+import 'package:nfc_app/pages/attendance%20report/chart_page.dart';
 import 'package:nfc_app/pages/attendance%20report/filter_page.dart';
 import 'package:nfc_app/provider/attendanceData_provider.dart';
 import 'package:nfc_app/provider/date_provider.dart';
@@ -300,6 +301,9 @@ class AnalyticsPage extends ConsumerWidget {
                   });
                 }
 
+                print("NUMBER OF DATES IN IN RANGE WHERE THERE IS A SCHED:");
+                print(groupedEntries.length);
+
                 return Column(
                   children: [
                     // ! SELECTED FILTER
@@ -355,7 +359,8 @@ class AnalyticsPage extends ConsumerWidget {
                                               0 &&
                                           (selectedFilters['sched'] as int) != 0
                                       ? '$schedDetail'
-                                      : ''); //! Pass the data
+                                      : '',
+                                  groupedEntries.length); //! Pass the data
                             } catch (e) {
                               print("error generating pdf: $e");
                             }
@@ -462,8 +467,8 @@ class AnalyticsPage extends ConsumerWidget {
                           1: FlexColumnWidth(),
                           2: FixedColumnWidth(65),
                           3: FixedColumnWidth(60),
-                          // 3: FixedColumnWidth(120.0),
                           4: FixedColumnWidth(55),
+                          5: FixedColumnWidth(40),
                         },
                         border: TableBorder
                             .all(), // Allows to add a border decoration around your table
@@ -528,6 +533,17 @@ class AnalyticsPage extends ConsumerWidget {
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 2, vertical: 4),
+                                  child: Text(
+                                    '',
+                                    style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w500),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                               ]),
                           // display the results
                           for (final student in result)
@@ -586,6 +602,23 @@ class AnalyticsPage extends ConsumerWidget {
                                   textAlign: TextAlign.center,
                                 ),
                               ),
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          ChartPage(
+                                        totalAttendanceValue:
+                                            groupedEntries.length,
+                                        studentDetail: student,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: Icon(Icons.pie_chart_rounded),
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
+                              )
                             ])
                         ]),
 
