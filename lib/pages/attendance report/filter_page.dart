@@ -399,7 +399,7 @@ class FilterPage extends ConsumerWidget {
                       DropdownMenuItem<String>(
                         value: "All",
                         child: Text(
-                          "Intersex",
+                          "All",
                           style: TextStyle(
                               fontFamily: "Roboto",
                               fontSize: 14,
@@ -420,6 +420,16 @@ class FilterPage extends ConsumerWidget {
                         value: "Female",
                         child: Text(
                           "Female",
+                          style: TextStyle(
+                              fontFamily: "Roboto",
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ),
+                      DropdownMenuItem<String>(
+                        value: "Intersex",
+                        child: Text(
+                          "Intersex",
                           style: TextStyle(
                               fontFamily: "Roboto",
                               fontSize: 14,
