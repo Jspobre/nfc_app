@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nfc_app/database/database_service.dart';
@@ -241,7 +240,7 @@ class _AddStudentState extends State<AddStudent> {
                                       },
                                       activeColor: Color(0xff16A637),
                                     ),
-                                          RadioListTile<String>(
+                                    RadioListTile<String>(
                                       title: const Text(
                                         'Intersex',
                                         style: TextStyle(
