@@ -19,11 +19,8 @@ import 'package:nfc_app/widgets/bottom%20sheet%20modal/modal_inside_modal.dart';
 import 'package:nfc_app/widgets/bottom%20sheet%20modal/read_modal.dart';
 import 'package:nfc_app/widgets/bottom%20sheet%20modal/scan_modal.dart';
 import 'package:nfc_app/widgets/styledButton.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io' show Platform, sleep;
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
@@ -49,7 +46,6 @@ class _HomeState extends State<Home> {
   String tappedScheduleInfo = '';
   String? tappedFullName;
   bool _scanning = false;
-  final DatabaseReference _databaseReference = FirebaseDatabase.instance.ref();
   String _lastScannedData = '';
 
   @override
@@ -175,8 +171,6 @@ class _HomeState extends State<Home> {
     if (tag == null || scannedData.isEmpty) {
       return;
     } else {
-      bool dataExists = await checkIfDataExists(scannedData);
-
       if (_lastScannedData == scannedData) {
         print('Skipping consecutive duplicate data: $scannedData');
         return;
@@ -297,19 +291,6 @@ class _HomeState extends State<Home> {
     // Return a DateTime object representing the specified time
     return DateTime(DateTime.now().year, DateTime.now().month,
         DateTime.now().day, hour, minute);
-  }
-
-  Future<bool> checkIfDataExists(String scannedData) async {
-    DatabaseEvent event = await _databaseReference.once();
-
-    if (event.snapshot.value != null) {
-      // Explicitly cast the value to Map<dynamic, dynamic>
-      Map<dynamic, dynamic> entries =
-          (event.snapshot.value as Map<dynamic, dynamic>);
-      return entries.values.any((entry) => entry['tag_data'] == scannedData);
-    }
-
-    return false; // No data in the database, so no duplicate
   }
 
   @override

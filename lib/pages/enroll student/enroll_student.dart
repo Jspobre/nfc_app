@@ -14,9 +14,8 @@ class EnrollStudent extends StatefulWidget {
 class _EnrollStudentState extends State<EnrollStudent> {
   List<Map<String, dynamic>> subjects = [];
   List<Map<String, dynamic>> students = [];
-Set<String> selectedStudents = Set<String>(); // Define selectedStudents
+  Set<String> selectedStudents = Set<String>(); // Define selectedStudents
   int? selectedCourse;
-  String? selectedStudent;
 
   @override
   void initState() {
@@ -43,39 +42,41 @@ Set<String> selectedStudents = Set<String>(); // Define selectedStudents
     });
   }
 
-Future<void> enrollStudent() async {
-  DatabaseService databaseService = DatabaseService();
-  final subjectId = selectedCourse ?? 0;
-  final studentNumber = selectedStudent ?? '';
+  Future<void> enrollStudent() async {
+    DatabaseService databaseService = DatabaseService();
+    final subjectId = selectedCourse ?? 0;
+    // final studentNumber = selectedStudent ?? '';
 
-  try {
-    await databaseService.assignSubject(studentNumber, subjectId);
+    selectedStudents.forEach((studentNumber) async {
+      try {
+        await databaseService.assignSubject(studentNumber, subjectId);
 
-    print("Student number: $studentNumber");
-    print("Subject ID: $subjectId");
-    // Show toast message
+        print("Student number: $studentNumber");
+        print("Subject ID: $subjectId");
+        // Show toast message
 
-    Fluttertoast.showToast(
-      msg: 'Student successfully enrolled!',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-    );
+        Fluttertoast.showToast(
+          msg: 'Student: $studentNumber successfully enrolled!',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+        );
+      } catch (error) {
+        print("Error enrolling student: $studentNumber, erro:$error");
+        Fluttertoast.showToast(
+          msg: 'Error enrolling student: $studentNumber, error: $error',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+        );
+      }
+    });
 
     // Clear selected values
     setState(() {
       selectedCourse = null;
-      selectedStudent = null;
       selectedStudents.clear(); // Clear selected students
     });
-  } catch (error) {
-    print("Error enrolling student: $error");
-    Fluttertoast.showToast(
-      msg: 'Error enrolling student: $error',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-    );
   }
-}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -188,7 +189,7 @@ Future<void> enrollStudent() async {
                 ),
               ),
               const SizedBox(height: 10),
-                          TextFieldContainer(
+              TextFieldContainer(
                 label: "Student lists",
                 inputWidget: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,19 +200,24 @@ Future<void> enrollStudent() async {
                             ? Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: students
-                                    .where((student) => student['student_num'] != null)
+                                    .where((student) =>
+                                        student['student_num'] != null)
                                     .map((student) {
-                                  final studentName = student['full_name'] ?? 'Unknown Course';
+                                  final studentName =
+                                      student['full_name'] ?? 'Unknown Course';
                                   return Row(
                                     children: [
                                       Checkbox(
-                                        value: selectedStudents.contains(student['student_num']),
+                                        value: selectedStudents
+                                            .contains(student['student_num']),
                                         onChanged: (bool? newValue) {
                                           setState(() {
                                             if (newValue!) {
-                                              selectedStudents.add(student['student_num']);
+                                              selectedStudents
+                                                  .add(student['student_num']);
                                             } else {
-                                              selectedStudents.remove(student['student_num']);
+                                              selectedStudents.remove(
+                                                  student['student_num']);
                                             }
                                           });
                                         },
@@ -234,15 +240,15 @@ Future<void> enrollStudent() async {
                                 'No subjects available',
                                 style: TextStyle(color: Colors.red),
                               ),
-                              ],
-                            ),
-                          ),
-                    SizedBox(height: 20), // Adjust spacing as needed
-                    StyledButton(
-                      btnText: 'Enroll',
-                      onClick: () {
-                        enrollStudent();
-                    },
+                  ],
+                ),
+              ),
+              SizedBox(height: 20), // Adjust spacing as needed
+              StyledButton(
+                btnText: 'Enroll',
+                onClick: () {
+                  enrollStudent();
+                },
               ),
               SizedBox(height: 20), // Add additional spacing at the end
             ],
